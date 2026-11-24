@@ -102,6 +102,13 @@
         "type": "boolean",
         "default": true
       },
+      "saveTrackerVideo": {
+        "type": "boolean",
+        "default": true,
+        "x-ui": {
+          "help": "Permit automatic camera video for this experiment. Individual tracker video settings still apply. Turning this off leaves tracking and VR data recording active."
+        }
+      },
       "configs": {
         "type": "array",
         "items": {
@@ -818,7 +825,8 @@
         "mode": "1920x1080",
         "width": 1920,
         "height": 1080
-      }
+      },
+      "saveTrackerVideo": true
     },
     "required": [
       "configs"
@@ -13633,7 +13641,7 @@
           "Swarm"
         ],
         "x-ui": {
-          "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+          "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
         }
       },
       "kannadiModelPath": {
@@ -14429,6 +14437,81 @@
         },
         "default": null
       },
+      "groundAppearance": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "texture": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "SceneDefault",
+              "Sand",
+              "Grass",
+              "Custom",
+              0,
+              1,
+              2,
+              3
+            ],
+            "default": "SceneDefault"
+          },
+          "groundTexturePath": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "x-ui": {
+              "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+            }
+          },
+          "tilingX": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          },
+          "tilingY": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          }
+        },
+        "default": null
+      },
+      "initialHeadingSeed": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "default": null,
+        "x-ui": {
+          "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+        }
+      },
       "numberOfRings": {
         "type": [
           "integer",
@@ -14438,6 +14521,7 @@
         "maximum": 2147483647,
         "default": null,
         "x-ui": {
+          "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
           "slider": {
             "min": 0.0,
             "max": 10.0,
@@ -14452,7 +14536,11 @@
         ],
         "minimum": -3.40282347E+38,
         "maximum": 3.40282347E+38,
-        "default": null
+        "default": null,
+        "x-ui": {
+          "unit": "scene units",
+          "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+        }
       },
       "spacing": {
         "type": [
@@ -14462,6 +14550,54 @@
         "minimum": -3.40282347E+38,
         "maximum": 3.40282347E+38,
         "default": null
+      },
+      "mirrorSpawn": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "layout": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Random",
+              "Grid",
+              0,
+              1
+            ],
+            "default": "Grid"
+          },
+          "width": {
+            "type": "number",
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 100.0,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+            }
+          },
+          "depth": {
+            "type": "number",
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 100.0,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+            }
+          }
+        },
+        "default": null,
+        "x-ui": {
+          "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+        }
       },
       "kannadiTilePrefab": {
         "type": [
@@ -16663,7 +16799,7 @@
               "Swarm"
             ],
             "x-ui": {
-              "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
             }
           },
           "kannadiModelPath": {
@@ -17458,6 +17594,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -17467,6 +17678,7 @@
             "maximum": 2147483647,
             "default": null,
             "x-ui": {
+              "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
               "slider": {
                 "min": 0.0,
                 "max": 10.0,
@@ -17481,7 +17693,11 @@
             ],
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
-            "default": null
+            "default": null,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+            }
           },
           "spacing": {
             "type": [
@@ -17491,6 +17707,54 @@
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
             "default": null
+          },
+          "mirrorSpawn": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "layout": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "Random",
+                  "Grid",
+                  0,
+                  1
+                ],
+                "default": "Grid"
+              },
+              "width": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+                }
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
           },
           "kannadiTilePrefab": {
             "type": [
@@ -20909,7 +21173,7 @@
               "Swarm"
             ],
             "x-ui": {
-              "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
             }
           },
           "kannadiModelPath": {
@@ -21704,6 +21968,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -21713,6 +22052,7 @@
             "maximum": 2147483647,
             "default": null,
             "x-ui": {
+              "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
               "slider": {
                 "min": 0.0,
                 "max": 10.0,
@@ -21727,7 +22067,11 @@
             ],
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
-            "default": null
+            "default": null,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+            }
           },
           "spacing": {
             "type": [
@@ -21737,6 +22081,54 @@
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
             "default": null
+          },
+          "mirrorSpawn": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "layout": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "Random",
+                  "Grid",
+                  0,
+                  1
+                ],
+                "default": "Grid"
+              },
+              "width": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+                }
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
           },
           "kannadiTilePrefab": {
             "type": [
@@ -25155,7 +25547,7 @@
               "Swarm"
             ],
             "x-ui": {
-              "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
             }
           },
           "kannadiModelPath": {
@@ -25950,6 +26342,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -25959,6 +26426,7 @@
             "maximum": 2147483647,
             "default": null,
             "x-ui": {
+              "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
               "slider": {
                 "min": 0.0,
                 "max": 10.0,
@@ -25973,7 +26441,11 @@
             ],
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
-            "default": null
+            "default": null,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+            }
           },
           "spacing": {
             "type": [
@@ -25983,6 +26455,54 @@
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
             "default": null
+          },
+          "mirrorSpawn": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "layout": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "Random",
+                  "Grid",
+                  0,
+                  1
+                ],
+                "default": "Grid"
+              },
+              "width": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+                }
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
           },
           "kannadiTilePrefab": {
             "type": [
@@ -30608,7 +31128,7 @@
       },
       "numberOfLocusts": 64,
       "density": null,
-      "spawnAreaSize": 68,
+      "spawnAreaSize": 100,
       "spawnType": "Grid",
       "mu": 0,
       "kappa": 100000,
@@ -30740,8 +31260,8 @@
         "maskBelowHorizon": false,
         "imageWidth": 4096
       },
-      "boundaryLengthX": 72,
-      "boundaryLengthZ": 72,
+      "boundaryLengthX": 100,
+      "boundaryLengthZ": 100,
       "resetPositionOnStart": true,
       "resetRotationOnStart": true,
       "uniformSkyColor": null,
@@ -30765,14 +31285,14 @@
         "continuationSpeedMetresPerSecond": null,
         "preRollSeconds": 0
       },
-      "worldUnitsPerMetre": null,
+      "worldUnitsPerMetre": 100,
       "nearClipMetres": 0.002,
-      "farClipMetres": 0.6,
+      "farClipMetres": 0.8,
       "locustSpeedStdDev": 0,
-      "volumeHalfExtentMetres": null,
       "preserveBoundaryOvershoot": true,
       "headingReferenceId": "",
-      "directionDistribution": "Legacy"
+      "directionDistribution": "Legacy",
+      "periodicBoundary": true
     }
   },
   "kannadi": {
@@ -30793,7 +31313,7 @@
           "Swarm"
         ],
         "x-ui": {
-          "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+          "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
         }
       },
       "kannadiModelPath": {
@@ -31589,6 +32109,81 @@
         },
         "default": null
       },
+      "groundAppearance": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "texture": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "SceneDefault",
+              "Sand",
+              "Grass",
+              "Custom",
+              0,
+              1,
+              2,
+              3
+            ],
+            "default": "SceneDefault"
+          },
+          "groundTexturePath": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "x-ui": {
+              "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+            }
+          },
+          "tilingX": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          },
+          "tilingY": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          }
+        },
+        "default": null
+      },
+      "initialHeadingSeed": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "default": null,
+        "x-ui": {
+          "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+        }
+      },
       "numberOfRings": {
         "type": [
           "integer",
@@ -31598,6 +32193,7 @@
         "maximum": 2147483647,
         "default": null,
         "x-ui": {
+          "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
           "slider": {
             "min": 0.0,
             "max": 10.0,
@@ -31612,7 +32208,11 @@
         ],
         "minimum": -3.40282347E+38,
         "maximum": 3.40282347E+38,
-        "default": null
+        "default": null,
+        "x-ui": {
+          "unit": "scene units",
+          "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+        }
       },
       "spacing": {
         "type": [
@@ -31622,6 +32222,54 @@
         "minimum": -3.40282347E+38,
         "maximum": 3.40282347E+38,
         "default": null
+      },
+      "mirrorSpawn": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "layout": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Random",
+              "Grid",
+              0,
+              1
+            ],
+            "default": "Grid"
+          },
+          "width": {
+            "type": "number",
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 100.0,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+            }
+          },
+          "depth": {
+            "type": "number",
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 100.0,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+            }
+          }
+        },
+        "default": null,
+        "x-ui": {
+          "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+        }
       },
       "kannadiTilePrefab": {
         "type": [
@@ -33823,7 +34471,7 @@
               "Swarm"
             ],
             "x-ui": {
-              "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
             }
           },
           "kannadiModelPath": {
@@ -34618,6 +35266,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -34627,6 +35350,7 @@
             "maximum": 2147483647,
             "default": null,
             "x-ui": {
+              "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
               "slider": {
                 "min": 0.0,
                 "max": 10.0,
@@ -34641,7 +35365,11 @@
             ],
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
-            "default": null
+            "default": null,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+            }
           },
           "spacing": {
             "type": [
@@ -34651,6 +35379,54 @@
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
             "default": null
+          },
+          "mirrorSpawn": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "layout": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "Random",
+                  "Grid",
+                  0,
+                  1
+                ],
+                "default": "Grid"
+              },
+              "width": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+                }
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
           },
           "kannadiTilePrefab": {
             "type": [
@@ -38069,7 +38845,7 @@
               "Swarm"
             ],
             "x-ui": {
-              "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
             }
           },
           "kannadiModelPath": {
@@ -38864,6 +39640,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -38873,6 +39724,7 @@
             "maximum": 2147483647,
             "default": null,
             "x-ui": {
+              "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
               "slider": {
                 "min": 0.0,
                 "max": 10.0,
@@ -38887,7 +39739,11 @@
             ],
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
-            "default": null
+            "default": null,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+            }
           },
           "spacing": {
             "type": [
@@ -38897,6 +39753,54 @@
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
             "default": null
+          },
+          "mirrorSpawn": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "layout": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "Random",
+                  "Grid",
+                  0,
+                  1
+                ],
+                "default": "Grid"
+              },
+              "width": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+                }
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
           },
           "kannadiTilePrefab": {
             "type": [
@@ -42315,7 +43219,7 @@
               "Swarm"
             ],
             "x-ui": {
-              "help": "Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
             }
           },
           "kannadiModelPath": {
@@ -43110,6 +44014,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -43119,6 +44098,7 @@
             "maximum": 2147483647,
             "default": null,
             "x-ui": {
+              "help": "Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.",
               "slider": {
                 "min": 0.0,
                 "max": 10.0,
@@ -43133,7 +44113,11 @@
             ],
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
-            "default": null
+            "default": null,
+            "x-ui": {
+              "unit": "scene units",
+              "help": "Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."
+            }
           },
           "spacing": {
             "type": [
@@ -43143,6 +44127,54 @@
             "minimum": -3.40282347E+38,
             "maximum": 3.40282347E+38,
             "default": null
+          },
+          "mirrorSpawn": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "layout": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "Random",
+                  "Grid",
+                  0,
+                  1
+                ],
+                "default": "Grid"
+              },
+              "width": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled."
+                }
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 100.0,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "scene units",
+                  "help": "Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled."
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
           },
           "kannadiTilePrefab": {
             "type": [

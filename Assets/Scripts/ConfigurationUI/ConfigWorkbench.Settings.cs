@@ -126,6 +126,8 @@ namespace ConfigurationUI
                 editToolbar.Add(previews);
                 BuildPopulationAppearance(scroll,payload,schema,prefix);
                 if(schema["properties"]?["objects"]!=null||payload["objects"] is JArray)BuildObjectCollection(scroll,payload,schema,prefix);
+                if (schema["properties"]?[LocustGroundConfig.Field] is JObject groundSchema)
+                    BuildGroundControls(scroll, selected, payload, prefix, groundSchema);
                 var sky=new Foldout {name="appearance-sky",text="Sky & light",value=settingsTab=="Sky"||!(payload["objects"] is JArray objects)||objects.Count==0};sky.AddToClassList("editor-disclosure");scroll.Add(sky);
                 var skyRow=Row("object-visual-row");sky.Add(skyRow);
                 var skyControls=new VisualElement();skyControls.AddToClassList("object-main-controls");skyControls.AddToClassList("sky-main-controls");skyRow.Add(skyControls);
@@ -493,6 +495,84 @@ namespace ConfigurationUI
             if(key=="spawnVolumeSize") return new JObject { ["x"]=side,["y"]=side,["z"]=side };
             return ConfigSchema.NewValue(schema);
         }
+        private void BuildGroundControls(VisualElement parent, ConfigDocument document, JObject payload, string[] prefix, JObject schema)
+        {
+            var path = prefix.Concat(new[] { LocustGroundConfig.Field }).ToArray();
+            var ground = payload[LocustGroundConfig.Field] as JObject ?? new JObject();
+            Enum.TryParse((string)ground["texture"], true, out LocustGroundTexture savedTexture);
+            var section = new Foldout { name = "appearance-ground", text = "Ground", value = ground.HasValues };
+            section.AddToClassList("editor-disclosure");
+            parent.Add(section);
+
+            var textures = new List<string> { "Scene default (dry grass)", "Sand", "Grass", "Custom image…" };
+            var customFiles = new List<string>();
+            string directory = System.IO.Path.Combine(RuntimePaths.ConfigRoot, "GroundTextures");
+            if (System.IO.Directory.Exists(directory))
+                customFiles.AddRange(System.IO.Directory.EnumerateFiles(directory)
+                    .Where(file => new[] { ".png", ".jpg", ".jpeg" }.Contains(System.IO.Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
+                    .Select(file => System.IO.Path.GetFileName(file)).OrderBy(file => file, StringComparer.OrdinalIgnoreCase));
+            const int customIndex = (int)LocustGroundTexture.Custom;
+            textures.AddRange(customFiles.Select(file => "GroundTextures/" + file));
+            string savedPath = (string)ground["groundTexturePath"];
+            int choice = Enum.IsDefined(typeof(LocustGroundTexture), savedTexture) ? (int)savedTexture : 0;
+            if (choice == customIndex && !string.IsNullOrWhiteSpace(savedPath))
+            {
+                if (!textures.Contains(savedPath)) textures.Add(savedPath);
+                choice = textures.IndexOf(savedPath);
+            }
+            var picker = new DropdownField("Ground texture", textures, choice) {
+                name = "ground-texture", tooltip = "Choose a stock texture or add a PNG or JPEG under Config/GroundTextures."
+            };
+            section.Add(picker);
+            void Select(LocustGroundTexture texture, string reference)
+            {
+                StudioEdit(document, root => {
+                    AssignAt(root, path.Concat(new[] { "texture" }).ToArray(), new JValue(texture.ToString()));
+                    var settings = (JObject)ConfigDocument.At(root, path);
+                    if (reference == null) settings.Remove("groundTexturePath");
+                    else settings["groundTexturePath"] = reference;
+                });
+            }
+            picker.RegisterValueChangedCallback(eventArgs => Guard(() => {
+                RequireApplied();
+                int index = textures.IndexOf(eventArgs.newValue);
+                if (index < customIndex) Select((LocustGroundTexture)index, null);
+                else if (index > customIndex) Select(LocustGroundTexture.Custom, eventArgs.newValue);
+                else
+                {
+                    picker.SetValueWithoutNotify(textures[choice]);
+                    var dialog = OpenModal("Choose ground texture", "Use a PNG or JPEG image. MATREX archives it with the run.");
+                    dialog.AddToClassList("small-dialog");
+                    var input = new TextField("Image path") { value = savedPath ?? "" };
+                    dialog.Add(input);
+                    var format = new DropdownField(new List<string> { "png", "jpg", "jpeg" }, 0);
+                    var browse = Row();
+                    browse.Add(format);
+                    browse.Add(StudioButton("Browse…", "file", () => BrowseFile("Open ground texture", format.value, file => input.value = file), "quiet"));
+                    dialog.Add(browse);
+                    dialog.Add(StudioButton("Use texture", "image", () => {
+                        RequireApplied();
+                        string reference = input.value.Trim();
+                        ModelTextureLibrary.ValidateReference(reference);
+                        if (!System.IO.File.Exists(ExperimentConfigFiles.Resolve(reference)))
+                            throw new ArgumentException("Choose an existing ground image.");
+                        CloseModal();
+                        Select(LocustGroundTexture.Custom, reference);
+                    }, "primary"));
+                }
+            }));
+            var tiling = Row();
+            foreach (string axis in new[] { "tilingX", "tilingY" })
+                tiling.Add(Setting(document, path.Concat(new[] { axis }).ToArray(), ConfigSchema.Child(schema, axis), ground, schema));
+            section.Add(tiling);
+            if (ground["tilingX"] != null || ground["tilingY"] != null)
+                section.Add(StudioButton("Use material tiling", "settings", () => StudioEdit(document, root => {
+                    var settings = (JObject)ConfigDocument.At(root, path);
+                    settings.Remove("tilingX");
+                    settings.Remove("tilingY");
+                }), "quiet"));
+        }
+
         private int selectedSkyMode;
         private void BuildSkyChoices(VisualElement target,JObject payload,JObject schema,string[] prefix)
         {

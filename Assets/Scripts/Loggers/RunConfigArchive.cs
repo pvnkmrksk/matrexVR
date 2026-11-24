@@ -222,7 +222,8 @@ public sealed class RunConfigArchive
                             CaptureFile((string)variant["texturePath"], ModelTextureRole, false, required, scene, visited);
                 string role=property.Name=="configFile"?"experiment":property.Name=="design"?"design":
                     property.Name=="trajectoryFile"?"trajectory":property.Name=="skyboxPath"?"skybox":
-                    property.Name=="modelPath" || property.Name=="kannadiModelPath"?"model":null;
+                    property.Name=="modelPath" || property.Name=="kannadiModelPath"?"model":
+                    property.Name=="groundTexturePath"?ModelTextureRole:null;
                 if(role!=null && property.Value.Type==JTokenType.String && !string.IsNullOrWhiteSpace((string)property.Value))
                 {
                     bool needed=required && !(role=="skybox" && obj["uniformSkyColor"]!=null && obj["uniformSkyColor"].Type!=JTokenType.Null);

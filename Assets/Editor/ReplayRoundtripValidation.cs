@@ -51,8 +51,12 @@ public static class ReplayRoundtripValidation
         Write(root,"__roundtrip-system.json",system);
         var choice=new JObject{["closedLoopPosition"]=false,["closedLoopOrientation"]=true,["autopilotEnabled"]=false,["initialPosition"]=new JObject{["x"]=0,["y"]=1,["z"]=0},["initialRotation"]=new JObject{["x"]=0,["y"]=0,["z"]=0},["uniformSkyColor"]=new JObject{["r"]=.12,["g"]=.24,["b"]=.36,["a"]=1},["objects"]=new JArray(new JObject{["type"]="Cube",["material"]="Black",["position"]=new JObject{["x"]=-4,["y"]=1,["z"]=12},["scale"]=new JObject{["x"]=2,["y"]=8,["z"]=2}}),["autoTrimSettings"]=new JObject{["flightCheckEnabled"]=false}};
         var phasedChoice=new JObject();
-        foreach(var part in new[]{("preStimulus",.6),("stimulus",2.0),("postStimulus",1.4)})
+        foreach(var part in new[]{("preStimulus",1.2),("stimulus",1.4),("postStimulus",1.4)})
         {var payload=(JObject)choice.DeepClone();payload["enabled"]=true;payload["durationSeconds"]=part.Item2;phasedChoice[part.Item1]=payload;}
+        var preStimulus = (JObject)phasedChoice["preStimulus"];
+        preStimulus.Remove("uniformSkyColor");
+        preStimulus["nightSky"] = new JObject { ["enabled"] = true, ["localTime"] = "22:00:00", ["date"] = "2026-10-07",
+            ["imageWidth"] = 1024, ["advanceWithRealTime"] = false, ["maskBelowHorizon"] = false };
         Write(root,"__roundtrip-choice.json",phasedChoice);
         var dynamic=new JObject{["repetitions"]=1,["shuffle"]=false,["loop"]=false,["autoTrimSettings"]=new JObject{["flightCheckEnabled"]=false},["steps"]=new JArray(new JObject{["name"]="Recorded, color swap",["closedLoopPosition"]=false,["closedLoopOrientation"]=true,["swapAfterSeconds"]=1.5,["initialPosition"]=new JObject{["x"]=0,["y"]=1,["z"]=0},["objects"]=new JArray(Bar(-4,new JArray(0,0,0,1),new JArray(.8,.3,.1,1)),Bar(4,new JArray(.7,.7,.7,1),new JArray(.1,.6,.8,1))),["camera"]=new JArray(new JObject{["vrId"]="VR1",["clearFlags"]="SolidColor",["bgColor"]=new JArray(.3,.3,.3,1)}),["trigger"]=new JObject{["type"]="time",["seconds"]=60}})};
         Write(root,"__roundtrip-dynamic.json",dynamic);
@@ -132,6 +136,7 @@ public static class ReplayRoundtripValidation
                     Check(Vector3.Distance(exact.position,Vec(observation.position))<.00001f&&Quaternion.Angle(Quaternion.Euler(exact.rotation),Quaternion.Euler(Vec(observation.rotation)))<.005f,"recording captures the rendered pose after movement: "+observation.image);
                     seeks.Add(exact);
                 }
+                Check(seeks[0].phase == "preStimulus" && !string.IsNullOrEmpty(seeks[0].skyboxId), "The first observed phase has an archived astronomical sky");
                 seeks.Add(seeks[2]);seeks.Add(seeks[0]); // Reverse through swap and across scene boundary.
                 File.WriteAllText(Path.Combine(output,"live-observations.json"),JsonConvert.SerializeObject(observations,Formatting.Indented));
                 SceneManager.sceneLoaded+=SetupReplay;ReplayController.OpenSession(runFolder);stage=2;nextFrame=Time.frameCount+5;return;
@@ -161,6 +166,10 @@ public static class ReplayRoundtripValidation
                     .Where(value=>value.Key==(expected.scene=="Choice"?"choice":"dynamic:VR1")&&value.gameObject.activeInHierarchy&&value.GetComponentInParent<RecordedPendingDestroy>(true)==null)
                     .SelectMany(value=>value.GetComponentsInChildren<Renderer>()).ToArray();
                 var observation=observations.First(o=>o.frame==expected.unityFrame&&o.scene==expected.scene);
+                if (expected.scene == "Choice" && expected.phase == "preStimulus")
+                    CheckOverviewSky(expected, seekIndex == 0);
+                if (expected.scene == "Choice_desync" && string.IsNullOrEmpty(expected.skyboxId))
+                    Check(Camera.main.clearFlags == CameraClearFlags.SolidColor, "Overview clears the prior managed sky on an unskied row");
                 Check(visuals.Length==observation.colors.Length,"recorded stimulus count restored: "+seekIndex);
                 for(int i=0;i<visuals.Length;i++)Check(ColorDistance(visuals[i].sharedMaterial.color,observation.colors[i])<.00001f,"recorded object color including reverse swap: "+seekIndex+"/"+i);
                 var camera=Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).First(c=>c.name=="Replay animal view VR1");
@@ -201,6 +210,44 @@ public static class ReplayRoundtripValidation
                 ["materials"]=new JArray(renderer.sharedMaterials.Select(material=>material==null?JValue.CreateNull():(JToken)new JObject{["name"]=material.name,["shader"]=material.shader.name,["color"]=material.HasProperty("_Color")?new JArray(material.color.r,material.color.g,material.color.b,material.color.a):null,["queue"]=material.renderQueue})) })) };
     }
     static IEnumerable<Transform> Parents(Transform node){while(node!=null){yield return node;node=node.parent;}}
+    static void CheckOverviewSky(ReplaySessionArchive.Sample sample, bool render)
+    {
+        var camera = Camera.main;
+        var sky = camera.GetComponent<Skybox>();
+        Check(camera.clearFlags == CameraClearFlags.Skybox && sky != null && sky.enabled && sky.material != null,
+            "Movable overview displays the archived star sky on forward and backward seeks");
+        if (!render) return;
+        string skyPath = Path.Combine(runFolder, "Skyboxes", sample.skyboxId);
+        var metadata = JObject.Parse(File.ReadAllText(skyPath + ".json"));
+        Check((string)metadata["description"]?["mode"] == "astronomical" && (string)metadata["skyboxId"] == sample.skyboxId,
+            "Replay frame identifies an astronomical sky through saved metadata");
+        var archived = new Texture2D(2, 1, TextureFormat.RGBA32, false);
+        Check(archived.LoadImage(File.ReadAllBytes(skyPath + ".png")), "Archived star PNG decodes");
+        Check(((Texture2D)sky.material.mainTexture).GetPixels32().SequenceEqual(archived.GetPixels32()), "Overview sky uses the exact archived pixels");
+        Object.Destroy(archived);
+        var rotation = camera.transform.rotation;
+        bool orthographic = camera.orthographic;
+        int mask = camera.cullingMask;
+        try
+        {
+            camera.orthographic = false;
+            camera.cullingMask = 0;
+            camera.transform.rotation = Quaternion.Euler(-30, 0, 0);
+            var first = Render(camera);
+            camera.transform.rotation = Quaternion.Euler(-30, 90, 0);
+            var second = Render(camera);
+            var pixels = first.GetPixels32();
+            Check(pixels.Any(pixel => pixel.r > 0) && !pixels.SequenceEqual(second.GetPixels32()), "Stars render and move across the overview when the camera rotates");
+            File.WriteAllBytes(Path.Combine(output, "replay-overview-stars.png"), first.EncodeToPNG());
+            Object.Destroy(first); Object.Destroy(second);
+        }
+        finally
+        {
+            camera.cullingMask = mask;
+            camera.orthographic = orthographic;
+            camera.transform.rotation = rotation;
+        }
+    }
     static Texture2D Render(Camera camera)
     {
         var oldTarget=camera.targetTexture;var oldRect=camera.rect;float oldAspect=camera.aspect;var active=RenderTexture.active;

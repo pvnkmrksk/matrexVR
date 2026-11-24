@@ -1,4 +1,4 @@
-MATREX VR 0.4.4 — INDEPENDENT TRACKERS AND KANNADI MULTIPLAYER
+MATREX VR 0.4.7-rc.1 — RECORDING ARCHIVES AND INDEXED REPLAY
 Engine: Unity 6000.3.16f1
 https://github.com/pvnkmrksk/matrexVR
 https://pvnkmrksk.github.io/matrexVR/
@@ -6,9 +6,10 @@ https://pvnkmrksk.github.io/matrexVR/
 1. FIVE MINUTES: DEMO -> RECORD -> REPLAY
 
 After downloading, extract the ENTIRE operating-system ZIP into a writable folder.
-Keep the player, its data/libraries and this file together. Open the .exe on
-Windows, .app on macOS or .x86_64 on Linux. Unity Editor and Python are not needed
-for the player. See section 8 for platform requirements and capability limits.
+Keep the player, its data, libraries and this file together. On Linux, run
+Open MATREX VR.sh in the extracted folder. On Windows or macOS, open the player
+executable or app. Unity Editor and Python are optional for ordinary playback.
+See section 8 for platform requirements and capability limits.
 
 On a fresh desktop profile:
   1. Leave Night sky and Flying demonstration selected; choose Start demo.
@@ -21,7 +22,8 @@ On a fresh desktop profile:
   4. Choose Replay in the sidebar. On Replay recordings, select the newest
      completed run, then Replay selected. Refresh rescans the list.
   5. Space pauses/resumes; Left/Right seeks one second (Shift: ten seconds).
-     The default God's-eye view shows the recorded trajectory.
+     The default God's-eye view shows the recorded trajectory. Switch to
+     Perspective and look up to see the archived star sky on a night-sky row.
 
 Success: a scene runs, a completed recording appears, and its replay timeline
 advances. Pose/configuration recording does not require tracker video. Keep the
@@ -35,10 +37,10 @@ Existing profiles retain their saved startup flags. If a sequence auto-starts,
 press Escape once or relaunch with -configure to enter setup. Escape from setup
 quits the player. For example:
   open "/path/to/MATREX VR.app" --args -configure
-  "./MATREX VR.x86_64" -configure
+  "./Open MATREX VR.sh"
 
 Full five-minute guide and troubleshooting:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/five-minute-start.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.7-rc.1/docs/five-minute-start.md
 
 2. CONFIGURE A REAL APPARATUS
 
@@ -65,6 +67,14 @@ details, review the sequence, edit a block's Settings, save the setup and choose
 Start experiment. Each experiment creates a separate run folder. Auto start
 affects the next launch. Plots opens the optional separate Daari Deepa viewer.
 
+For the 16-rig desert experiment, select Desert locust · 16 rigs in the sequence
+picker and use your calibrated VR1–VR16 walking system configuration. Each cycle
+shuffles a blank control, an ordered simulated swarm, and Kannadi multiplayer.
+Each condition runs for ten seconds. Choose a ground texture and independent X/Y
+repeat counts under Appearance → Ground. Add PNG or JPEG files under
+GroundTextures/ in the active configuration folder.
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.7-rc.1/docs/desert-locust-experiment.md
+
 The supplied Examples include world starters, four terrain-choice treatments,
 swarm/social sequences and custom-model sequences. Settings and Edit JSON share
 one document. Actual edits preserve unknown fields and untouched numeric values;
@@ -75,27 +85,35 @@ Unity scene or controller requires a source build.
 
 3. WRITABLE FILES AND RECORDINGS
 
-Editable configuration: <Unity persistentDataPath>/Config/
-Recordings:             <player directory>/MATREX VR RunData/
+The Linux launcher anchors its paths to the extracted folder:
+  Config/       Editable experiment and apparatus settings
+  RunData/      Permanent timestamped recording folders
+  Cache/        Disposable replay indexes, including the animal pose cache
+  Preferences/ Local Unity preferences and logs
 
-On macOS, RunData is beside the .app, outside its signed bundle. Protected install
-locations use <persistentDataPath>/Installations/<installation-id>/RunData/.
-Replay recordings displays the exact root. Browse opens a recording elsewhere.
-Updates seed missing config files; existing user JSON is never replaced. Back up
-configs before version changes. Older recordings are not moved automatically.
+Print the launcher's absolute default paths without starting the player:
+  "./Open MATREX VR.sh" --show-paths
 
-Use absolute overrides for an isolated test profile, for example:
-  "./MATREX VR.x86_64" -configure --config-dir "/path/to/config" --data-dir "/path/to/runs"
+Read RUN-DATA.md in the package, RunData/README.md in the recording library, or
+README.md in a newly created run for the meaning of its files and fields. Existing
+runs retain their original location. Replay recordings displays the active path.
+Browse opens a complete or partial recording elsewhere in place.
+
+When launching the executable or app directly, editable configuration defaults
+to <Unity persistentDataPath>/Config/ and recordings default to RunData/ beside
+that player. Protected installation folders use an installation-specific data
+path under <persistentDataPath>/Installations/<installation-id>/RunData/.
+Updates seed missing configuration files and preserve existing settings.
+
+Use absolute overrides for an isolated test profile:
+  "./Open MATREX VR.sh" --config-dir "/path/to/config" --data-dir "/path/to/runs"
   open "/path/to/MATREX VR.app" --args -configure --config-dir "/path/to/config" --data-dir "/path/to/runs"
 
-Unity normally places persistentDataPath under:
-  Windows: %USERPROFILE%\AppData\LocalLow\<Company>\<Product>
-  macOS:   ~/Library/Application Support/<Company>/<Product>
-  Linux:   $XDG_CONFIG_HOME/unity3d/<Company>/<Product>
-           (usually ~/.config/unity3d/<Company>/<Product>)
-Company/Product are the build's Unity Player Settings. Editor defaults remain
-Assets/StreamingAssets and Assets/RunData. The local preview launcher instead
-uses its explicit Preview/Config and Preview/RunData folders.
+Unity uses the build's Company and Product in its persistentDataPath. On Windows
+this is under AppData/LocalLow and on macOS it is under Library/Application
+Support. On Linux it is under $XDG_CONFIG_HOME/unity3d, usually ~/.config/unity3d
+when launching directly. Editor defaults remain Assets/StreamingAssets and
+Assets/RunData. The local macOS preview uses Preview/Config and Preview/RunData.
 
 4. TRACKER VIDEO: REQUESTED IS NOT ACKNOWLEDGED
 
@@ -125,15 +143,20 @@ Check physical camera acquisition on the apparatus.
 
 5. REPLAY AND PRESERVE EVIDENCE
 
-Use the creating player build. New-contract recordings require matching build
-identity and complete, hash-verified saved evidence. A foreign build or missing
-required journal/model/config is an error; today's installed JSON is not silently
-substituted. Preserve the player archive with its run folders.
+Keep the creating player build alongside the complete run. The current player
+also accepts explicitly supported earlier builds. The progress bar shows the
+active stage as Replay reads evidence and restores the first scene. A partial
+copy can play surviving tracks and reports gaps. Keep manifests, journals,
+snapshots, rig and population files, Skyboxes and any media together.
 
-Replay reads the complete run folder: config_manifest.json, Configs, replay
-contract/journals, rig/population logs, Skyboxes and any media. Extract session
-ZIPs before opening. Browse, the folder field or --replay-session can open a run:
-  "./MATREX VR.x86_64" --replay-session "/path/to/session-folder"
+The full animal CSVs are the permanent record. Replay loads a lossless binary
+projection from a local cache when it matches the recording evidence. A new run
+can prepare that cache during finalization. An older run can build it the first
+time it opens. The launcher stores cached poses in Cache/MatrexReplay/AnimalPose-v1.
+A clean installation can rebuild them from the original CSVs.
+
+Extract session ZIPs before opening the folder. Use Browse, the path field or:
+  "./Open MATREX VR.sh" --replay-session "/path/to/session-folder"
   open "/path/to/MATREX VR.app" --args --replay-session "/path/to/session-folder"
 
 Space plays/pauses; Left/Right seeks; N/M jumps steps. Right-drag or I/J/K/L turns
@@ -162,7 +185,7 @@ connect through stdio with Python 3.11+ and the pinned SDK; uv run --locked --sc
 prepares it. Python is needed only for this optional adapter. The adapter may also be used from the
 matching source checkout's tools/ directory. Prepare dependencies before offline
 experiments. Full client configuration and tool reference:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/ai-control.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.7-rc.1/docs/ai-control.md
 
 Discover -> read workspace/schema -> edit JSON with its current revision -> save
 and validate -> start -> poll status -> stop -> await finalization -> replay.
@@ -170,7 +193,7 @@ Accepted Start means preparation began, not that a scene or recorder is ready.
 Read is_error results; after timeout inspect actual status before another mutation.
 Re-read stale revisions/conflicts. Quit and relaunch without --control-dir to
 remove the endpoint. Agent/contributor context:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/AGENTS.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.7-rc.1/AGENTS.md
 
 7. EVERYDAY CONTROLS
 
@@ -197,13 +220,12 @@ Check the native tracker release for its platform requirements and live-camera
 support. The linked recorded Daari Deepa viewer depends on the installed
 dashboard build. Internal Unity replay is independent.
 
-Software acceptance uses generated/sample input and isolated profiles. Windows
-and Linux are cross-built without native walkthroughs. Native OS pointer testing
-and physical camera, calibration, display mapping/exposure/LED timing remain
-separate. Evenly paced 60 FPS in dense many-camera scenes is not established.
-Preserve evidence and run a representative workload on the acquisition computer.
+Software acceptance uses recorded or generated sample input and isolated profiles.
+The release verification describes which package and platform were exercised.
+Physical camera, calibration, display mapping, exposure, LED timing, and dense
+many-camera frame pacing require checks on the acquisition computer.
 For a problem report include OS, exact build, action/error and runtime_trace.log.
 
 Detailed manuals, release evidence and limitations:
   https://pvnkmrksk.github.io/matrexVR/manual/
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/releases.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.7-rc.1/docs/release-notes-0.4.7-rc.1.md

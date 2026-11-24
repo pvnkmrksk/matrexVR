@@ -63,6 +63,14 @@ public static class ExperimentRandom
         }
     }
 
+    public static float InitialHeadingSample(int? seed, int rigIndex)
+    {
+        if (!seed.HasValue) return UnityEngine.Random.value;
+        int cycle = MainController.Instance != null ? MainController.Instance.currentTrial : 0;
+        var random = new System.Random(Derive(seed.Value, FormattableString.Invariant($"initial-heading:{cycle}:VR{rigIndex}")));
+        return (float)random.NextDouble();
+    }
+
     public static int NextSeed(string key)
     {
         occurrences.TryGetValue(key, out int occurrence); occurrences[key] = occurrence + 1;

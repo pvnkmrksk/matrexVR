@@ -185,7 +185,7 @@ public static class KineflyAutoTrimValidation
             autoTrimSettings = Fast()
         }));
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json"), JsonConvert.SerializeObject(new {
-            autoStart = true, loop = false, sequences = new[] {
+            autoStart = true, loop = true, sequences = new[] {
                 new { sceneName = "Swarm", duration = 1000, gain = 10.0, autoTrim = true, reloadScene = true, parameters = new { configFile = "auto-trim-test.json" } },
                 new { sceneName = "Swarm", duration = 1000, gain = -2.5, autoTrim = false, reloadScene = false, parameters = new { configFile = "auto-trim-test.json" } },
                 new { sceneName = "Swarm", duration = 1000, gain = 1.0, autoTrim = false, reloadScene = true, parameters = new { configFile = "auto-trim-test.json" } }
@@ -206,7 +206,7 @@ public static class KineflyAutoTrimValidation
             if (EditorApplication.timeSinceStartup > deadline) throw new Exception("Auto trim integration timeout at phase " + phase);
             if (phase == 0) { SceneManager.LoadScene("ControlScene"); phase = 1; return; }
             var main = MainController.Instance;
-            if (main == null || main.VRClosedLoops.Count != 4 || SceneManager.GetActiveScene().name != "Swarm") return;
+            if (main == null || main.VRClosedLoops.Count != 4 || SceneManager.GetActiveScene().name != SceneCompatibility.Resolve("Swarm")) return;
             var rigs = main.VRClosedLoops.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToArray();
             int tick = (int)(Time.realtimeSinceStartupAsDouble * 25);
             foreach (var rig in rigs) Feed(rig, tick, phase >= 4 ? (rig == rigs[2] ? -.9 : .9) : (rig == rigs[1] ? -.4 : .4), phase < 5);
@@ -227,11 +227,13 @@ public static class KineflyAutoTrimValidation
                     offsets[rig.name] = offset;
                 }
                 offsets[rigs[3].name] = rigs[3].GetYawDCOffset();
-                var hud = Object.FindFirstObjectByType<RuntimeStatusOverlay>().BuildText();
-                Check(hud.Contains("FLIGHT DASHBOARD") && hud.Contains("YAW CLOSED") && hud.Contains("AUTO TRIM") && hud.Contains("FLYING"), "Compact dashboard status");
+                var overlay = Object.FindFirstObjectByType<RuntimeStatusOverlay>();
+                Set(overlay, "showDetails", true);
+                var hud = overlay.BuildText();
+                Check(hud.Contains("EXPERIMENT") && hud.Contains("YAW CLOSED") && hud.Contains("AUTO TRIM") && hud.Contains("FLYING"), "Detailed dashboard status");
                 Check(hud.Contains("DC +") && hud.Contains("DC -") && hud.Contains("LAST AUTO: DC UP") && hud.Contains("LAST AUTO: DC DOWN"),
                     "Dashboard shows signed DC offsets and each rig's actual adjustment direction");
-                Check(hud.Contains("°/s") && hud.Contains("wing SD") && !hud.Contains(" rad"), "Dashboard angles and rates use degrees");
+                Check(hud.Contains("°/s") && hud.Contains("Wing SD") && !hud.Contains(" rad"), "Dashboard angles and rates use degrees");
                 var snapshot = JObject.FromObject(Object.FindFirstObjectByType<ExperimentTelemetry>().Capture(123));
                 foreach (var rigSnapshot in snapshot["rigs"].Take(3))
                 {
@@ -255,7 +257,8 @@ public static class KineflyAutoTrimValidation
                 BenchmarkLegacy();
                 CaptureDashboard();
                 Get<UnityEngine.UI.Button>(Object.FindFirstObjectByType<RuntimeStatusOverlay>(), "autoTrimButton").onClick.Invoke();
-                Check(rigs.All(r => !r.AutoTrim.Enabled), "Dashboard toggle disables current row");
+                Check(!rigs[0].AutoTrim.Enabled && rigs.Skip(1).All(r => r.AutoTrim.Enabled), "Dashboard toggles only the selected rig");
+                Check(main.GetCurrentSequenceStep().autoTrim, "Dashboard does not edit the reusable row");
                 var pausedHud = Object.FindFirstObjectByType<RuntimeStatusOverlay>().BuildText();
                 Check(pausedHud.Contains("DC +") && pausedHud.Contains("DC -") && pausedHud.Contains("LAST AUTO:"), "Offsets and last automatic changes remain visible with trim off");
                 Set(main, "timer", -1f); Call(main, "ManageTimerAndTransitions");
@@ -267,7 +270,7 @@ public static class KineflyAutoTrimValidation
             {
                 if (main.currentStep != 2 || rigs.Any(r => r.GetYawGain() != 1)) return;
                 foreach (var rig in rigs) Check(!rig.AutoTrim.Enabled && rig.GetYawDCOffset() == offsets[rig.name], "Reloaded scene retains automatic offsets with trim off");
-                main.SetCurrentAutoTrim(true); Check(rigs.All(r => r.AutoTrim.Enabled), "Button enables the row flag");
+                main.SetCurrentAutoTrim(true); Check(rigs.All(r => r.AutoTrim.Enabled), "Run-wide override enables trim for the current row");
                 phaseTime = EditorApplication.timeSinceStartup; phase = 4; return;
             }
             if (phase == 4)
@@ -289,8 +292,10 @@ public static class KineflyAutoTrimValidation
                 foreach (var rig in rigs.Take(3)) Check(rig.GetYawDCOffset() == offsets[rig.name], "Live open-loop/zero-gain/nonflight gates hold offsets");
                 Check(!rigs[2].AutoTrim.Flying, "Live nonflight indicator");
                 var overlay = Object.FindFirstObjectByType<RuntimeStatusOverlay>();
+                main.SelectNextAnimal(); main.SelectNextAnimal();
+                CaptureDashboard();
                 Get<UnityEngine.UI.Button>(overlay, "flightCheckButton").onClick.Invoke();
-                Check(rigs.All(r => !r.AutoTrim.FlightCheckEnabled), "Actual dashboard button bypasses the flight gate");
+                Check(!rigs[2].AutoTrim.FlightCheckEnabled && rigs.Where(r => r != rigs[2]).All(r => r.AutoTrim.FlightCheckEnabled), "Dashboard bypasses the flight gate only for the selected rig");
                 Check(overlay.BuildText().Contains("NOT FLYING") && overlay.BuildText().Contains("FLIGHT BYPASSED"), "HUD distinguishes measured nonflight from a bypass");
                 phaseTime = EditorApplication.timeSinceStartup; phase = 6; return;
             }
@@ -302,6 +307,22 @@ public static class KineflyAutoTrimValidation
                 CaptureDashboard();
                 Get<UnityEngine.UI.Button>(Object.FindFirstObjectByType<RuntimeStatusOverlay>(), "flightCheckButton").onClick.Invoke();
                 Check(rigs.All(r => r.AutoTrim.FlightCheckEnabled), "Dashboard restores flight checking");
+                main.SetCurrentFlightCheck(false);
+                Set(main, "timer", -1f); Call(main, "ManageTimerAndTransitions"); phase = 7; return;
+            }
+            if (phase == 7)
+            {
+                if (main.currentTrial != 1 || main.currentStep != 0 || rigs.Any(r => r.GetYawGain() != 10)) return;
+                Check(rigs.All(r => r.AutoTrim.Enabled && r.AutoTrim.FlightCheckEnabled), "Looping to the same authored row restores trim and flight-check defaults");
+                main.SetCurrentAutoTrim(false);
+                Check(!main.CurrentAutoTrimEnabled && main.GetCurrentSequenceStep().autoTrim, "Run-wide override leaves the authored auto-trim flag intact");
+                Set(main, "timer", -1f); Call(main, "ManageTimerAndTransitions");
+                Set(main, "timer", -1f); Call(main, "ManageTimerAndTransitions"); phase = 8; return;
+            }
+            if (phase == 8)
+            {
+                if (main.currentStep != 2 || rigs.Any(r => r.GetYawGain() != 1)) return;
+                Check(rigs.All(r => !r.AutoTrim.Enabled), "Earlier run-wide enable does not carry into a repeated row configured off");
                 Call(main, "FailExperiment", new InvalidOperationException("Expected validation failure"));
                 Check(rigs.All(r => !r.AutoTrim.Enabled), "Experiment failure disables trim");
                 main.StopSequence(); Check(rigs.All(r => !r.AutoTrim.Enabled), "Stopping disables automatic corrections");
@@ -312,13 +333,13 @@ public static class KineflyAutoTrimValidation
     }
     private static void CaptureDashboard()
     {
+        var overlay = Object.FindFirstObjectByType<RuntimeStatusOverlay>();
+        overlay.SetVisible(true); Set(overlay, "nextRefresh", 0.0); Call(overlay, "Update");
         if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) return;
         // Exclude only the known Editor Search indexing error from this operator-preview fixture.
         var errorQueue = (Queue<RuntimeStatusOverlay.ErrorEntry>)typeof(RuntimeStatusOverlay).GetField("errors", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
         var retained = errorQueue.Where(e => e.stackTrace == null || !e.stackTrace.Contains("UnityEditor.Search.SearchDatabase")).ToArray();
         errorQueue.Clear(); foreach (var error in retained) errorQueue.Enqueue(error);
-        var overlay = Object.FindFirstObjectByType<RuntimeStatusOverlay>();
-        overlay.SetVisible(true); Set(overlay, "nextRefresh", 0.0); Call(overlay, "Update");
         var canvas = Get<Canvas>(overlay, "canvas");
         var cameraRoot = new GameObject("Dashboard preview"); var camera = cameraRoot.AddComponent<Camera>();
         camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(.12f, .15f, .2f);

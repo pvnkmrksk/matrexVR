@@ -22,6 +22,8 @@ Flat experiments retain their sequence presentation timer after heading measurem
 
 The preserved Kannadi recipes remain under `Kannadi/`; this collection does not replace or rewrite them.
 
+[Desert locust · 16 rigs](Sequences/desert-locust-16rig.sequence.json) runs a blank control, an ordered generated swarm and Kannadi multiplayer for ten seconds each. It uses the same sand and gray sky in all conditions. [Setup and validation](../../../docs/desert-locust-experiment.md).
+
 For an ordered walking-swarm entrainment followed by all-to-all tracked social interaction, load `Sequences/swarm-entrainment-social.sequence.json`; `Sequences/social-coupling-control.sequence.json` provides the matched direct social control. Both share `Kannadi/social-coupling.example.json`, with `numberOfRings: 0` for no additional clones. The swarm is periodic and follows each observer, and both presentations use random cardinal yaw starts. [Setup and parameters](../../../docs/social-swarm-experiment.md).
 
 `Sequences/kinefly-auto-trim.example.json` runs a 240-second Kinefly calibration over Selwyn terrain with the live Milky Way star sky. Its provisional flight threshold and bounded corrections are tuned from six past recordings. See [auto trim](../../../docs/kinefly-auto-trim.md) for controls, units, replay results and continuation with trimming off.

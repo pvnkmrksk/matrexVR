@@ -80,28 +80,60 @@ public class MainController : MonoBehaviour
     private int selectedVRIndex = 1;
     public int SelectedVRIndex => selectedVRIndex;
     public bool AcceptsManualInput(int rigIndex) => selectedVRIndex == 0 || rigIndex == 0 || selectedVRIndex == rigIndex;
-    public bool CurrentAutoTrimEnabled => sequenceStarted && GetCurrentSequenceStep()?.autoTrim == true;
+    public bool CurrentAutoTrimEnabled => sequenceStarted && (autoTrimOverride ?? GetCurrentSequenceStep()?.autoTrim) == true;
     private AutoTrimConfig currentAutoTrimSettings = new AutoTrimConfig();
-    private bool? flightCheckOverride;
+    private bool? autoTrimOverride, flightCheckOverride;
+    private readonly Dictionary<string, bool> rigAutoTrimOverrides = new Dictionary<string, bool>();
+    private readonly Dictionary<string, bool> rigFlightCheckOverrides = new Dictionary<string, bool>();
     public bool CurrentFlightCheckEnabled => flightCheckOverride ?? currentAutoTrimSettings.flightCheckEnabled;
 
     public void RememberDCOffset(string vrId, float offset) => persistentDCOffsets[vrId] = offset;
 
-    // Dashboard button changes only the running row. Later rows keep their own configured flag.
-    public void SetCurrentAutoTrim(bool enabled)
+    public void SetCurrentAutoTrim(bool enabled, string vrId = null)
     {
         var step = GetCurrentSequenceStep();
-        if (!sequenceStarted || step == null) return;
-        step.autoTrim = enabled;
-        ApplyAutoTrimToClosedLoopComponents(step);
+        if (!sequenceStarted || SceneTransitionPending || step == null) return;
+        if (vrId == null)
+        {
+            autoTrimOverride = enabled;
+            rigAutoTrimOverrides.Clear();
+            ApplyAutoTrimToClosedLoopComponents(step);
+        }
+        else if (vrClosedLoops.TryGetValue(vrId, out var rig) && rig != null && rig.SupportsAutoTrim)
+        {
+            rigAutoTrimOverrides[vrId] = enabled;
+            ConfigureAutoTrim(rig, step, vrId);
+        }
     }
 
-    public void SetCurrentFlightCheck(bool enabled)
+    public void SetCurrentFlightCheck(bool enabled, string vrId = null)
     {
-        if (!sequenceStarted) return;
-        flightCheckOverride = enabled;
-        foreach (ClosedLoop rig in vrClosedLoops.Values)
-            if (rig != null) rig.AutoTrim.SetFlightCheckEnabled(enabled);
+        if (!sequenceStarted || SceneTransitionPending) return;
+        if (vrId == null)
+        {
+            flightCheckOverride = enabled;
+            rigFlightCheckOverrides.Clear();
+            foreach (ClosedLoop rig in vrClosedLoops.Values)
+                if (rig != null) rig.AutoTrim.SetFlightCheckEnabled(enabled);
+        }
+        else if (vrClosedLoops.TryGetValue(vrId, out var rig) && rig != null && rig.SupportsAutoTrim)
+        {
+            rigFlightCheckOverrides[vrId] = enabled;
+            rig.AutoTrim.SetFlightCheckEnabled(enabled);
+        }
+    }
+
+    private void ClearFlightCheckOverrides()
+    {
+        flightCheckOverride = null;
+        rigFlightCheckOverrides.Clear();
+    }
+
+    private void ClearTrimOverrides()
+    {
+        autoTrimOverride = null;
+        rigAutoTrimOverrides.Clear();
+        ClearFlightCheckOverrides();
     }
 
     // System Config properties
@@ -525,6 +557,7 @@ public class MainController : MonoBehaviour
         preparationCancellation?.Cancel();
         SequencePreparing = false;
         sequenceStarted = false;
+        ClearTrimOverrides();
         DesktopDisplay.SetStimulusResolution(null);
         savedHeadings.Clear();
         phaseRunner?.Cancel();
@@ -701,6 +734,7 @@ public class MainController : MonoBehaviour
 
     private void BeginPreparedSequence()
     {
+        ClearTrimOverrides();
         sequenceStarted = true;
         SequenceError = null;
         savedHeadings.Clear();
@@ -827,16 +861,21 @@ public class MainController : MonoBehaviour
         {
             currentAutoTrimSettings.Validate();
             foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None))
-            {
-                tracking.ConfigureAutoTrim(sequenceStarted && SequenceError == null && step.autoTrim, currentAutoTrimSettings);
-                tracking.AutoTrim.SetFlightCheckEnabled(CurrentFlightCheckEnabled);
-            }
+                ConfigureAutoTrim(tracking, step, tracking.RegisteredVrId);
         }
         catch (System.Exception error)
         {
             foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None)) tracking.AutoTrim.Disable();
             FailExperiment(error);
         }
+    }
+
+    private void ConfigureAutoTrim(ClosedLoop tracking, SequenceStep step, string vrId)
+    {
+        bool enabled = vrId != null && rigAutoTrimOverrides.TryGetValue(vrId, out var trim) ? trim : autoTrimOverride ?? step.autoTrim;
+        bool flightCheck = vrId != null && rigFlightCheckOverrides.TryGetValue(vrId, out var flight) ? flight : CurrentFlightCheckEnabled;
+        tracking.ConfigureAutoTrim(sequenceStarted && SequenceError == null && enabled, currentAutoTrimSettings);
+        tracking.AutoTrim.SetFlightCheckEnabled(flightCheck);
     }
 
     public void RegisterVRClosedLoop(string vrId, ClosedLoop tracking)
@@ -847,10 +886,7 @@ public class MainController : MonoBehaviour
         else persistentDCOffsets[vrId] = tracking.GetYawDCOffset();
         var step = GetCurrentSequenceStep();
         if (sequenceStarted && SequenceError == null && step != null)
-        {
-            tracking.ConfigureAutoTrim(step.autoTrim, currentAutoTrimSettings);
-            tracking.AutoTrim.SetFlightCheckEnabled(CurrentFlightCheckEnabled);
-        }
+            ConfigureAutoTrim(tracking, step, vrId);
     }
 
     public void UnregisterVRClosedLoop(string vrId, ClosedLoop tracking)
@@ -1122,7 +1158,7 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
         var settings = document?["autoTrimSettings"]?.ToObject<AutoTrimConfig>() ?? step?.autoTrimSettings ?? new AutoTrimConfig();
         settings.Validate();
         currentAutoTrimSettings = settings;
-        flightCheckOverride = null;
+        ClearFlightCheckOverrides();
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         using (ExperimentRandom.Scope("trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase))
         {
@@ -1207,6 +1243,7 @@ private void FailExperiment(System.Exception error)
     SequencePreparing = false;
     SequenceError = error.Message;
     sequenceStarted = false;
+    ClearTrimOverrides();
     DesktopDisplay.SetStimulusResolution(null);
     phaseRunner?.Cancel();
     foreach (ClosedLoop rig in vrClosedLoops.Values)
@@ -1277,6 +1314,7 @@ void ManageTimerAndTransitions()
     // ----------------------------------------------------------
     // TIME’S UP → decide how to move to the next SequenceStep
     // ----------------------------------------------------------
+    ClearTrimOverrides();
     currentStep++;
 
     // end-of-list logic (loop / quit) stays exactly as before
