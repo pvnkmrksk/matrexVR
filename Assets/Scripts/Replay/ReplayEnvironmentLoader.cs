@@ -128,7 +128,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             {
                 savedConfig = archive?.ExperimentFor(target);
                 visualConfig = savedConfig;
-                if (savedConfig != null && archive?.Presentations.IsCurrentContract == true && target.scene == "Kannadi" &&
+                if (savedConfig != null && archive?.Presentations.IsCurrentContract == true && (target.scene == "Kannadi" || target.scene == "Swarm") &&
                     archive.Presentations.For(target.presentationId)["parameters"] is JObject authoredParameters)
                 {
                     visualConfig = (JObject)savedConfig.DeepClone();
@@ -678,6 +678,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                     if(host!=null)
                         (host.GetComponent<KannadiWorldObjects>()??host.AddComponent<KannadiWorldObjects>()).Apply(currentVisualConfig?["objects"]?.ToObject<SceneObject[]>(),ReplayExecutionContext.Rigs(importedScene));
                 }
+                LocustGround.Apply(importedScene, currentVisualConfig?[LocustGroundConfig.Field]?.ToObject<LocustGroundConfig>());
                 ExperimentWorldObjects.Apply(importedScene,currentConfig);
                 RestoreRugosity(currentConfig);ExperimentSun.Apply(importedScene,currentConfig);
                 ExperimentVisibility.Apply(importedScene,currentConfig);

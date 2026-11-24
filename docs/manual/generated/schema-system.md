@@ -1,6 +1,6 @@
 # System schema fields
 
-This atlas lists **79 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **80 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -119,6 +119,18 @@ UI `visibleWhen`: `{"property":"mode","oneOf":["custom"]}`. This governs the for
 ### `saveSwarmData`
 
 Save virtual population agents every frame for analysis and replay. Switch off to measure rendering performance or run without swarm data. Animal tracking and behavior are still recorded.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+## saveTrackerVideo group
+
+### `saveTrackerVideo`
+
+Permit automatic camera video for this experiment. Individual tracker video settings still apply. Turning this off leaves tracking and VR data recording active.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -370,7 +382,7 @@ Common or scientific name of the real animal controlling this rig. Saved with it
 
 ### `configs[].tracker`
 
-Native tracker app settings. The ready-to-run starters launch a bundled tracker with Start; custom experiments can launch a configured app explicitly. Apps run independently and remain open when MATREX closes. Save calibration before Stop; stop the active tracker before changing its backend or input source.
+Installed tracker app settings for a local rig. You can launch a tracker explicitly or enable launch with Start in Configure. The tracker stays open after MATREX closes. Save calibration before stopping the tracker or switching its input.
 
 | Contract | Emitted value |
 | --- | --- |

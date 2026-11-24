@@ -184,6 +184,8 @@ Each entry uses prefab/material names registered in that scene controller's Insp
 
 Swarm/Bogong and Kannadi accept optional `nightSky` settings and a top-level `skyboxPath` override. See [night-sky.md](night-sky.md) for location, local date/time, 30-minute updates, physical north alignment, and saved images/IDs. The Bogong template enables this feature; omission preserves the scene background.
 
+For a flat Kannadi or Swarm scene, set `groundAppearance.texture` to `SceneDefault`, `Sand`, `Grass`, or `Custom`. A custom texture uses `groundAppearance.groundTexturePath`, a PNG or JPEG location under the active configuration folder or an absolute path. Optional `tilingX` and `tilingY` are positive repeat counts across the plane's texture axes. The stock plane is 200 m square and the stock materials repeat 200 times per axis, giving a 1 m tile. The workbench exposes these settings under **Appearance → Ground**. See the [desert experiment](desert-locust-experiment.md) for a complete sequence.
+
 Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.json`. The kinematic template uses the **Kannadi parser** and a single tile per rig (`numberOfRings:0`); there is no separate Kinematic scene or magic kinematic filename.
 
 | Shared movement field | Default | Meaning |
@@ -207,6 +209,7 @@ Kinefly explicitly selected in the system config uses the historical raw-radian 
 |---|---|---|
 | `numberOfRings` | Keep scene/current value (3 initially) | Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100. |
 | `initialHeadingDistribution` | `Continuous` | Swarm/Kannadi random yaw distribution: `Cardinal` independently draws 0°, 90°, 180° or 270° for each rig. Requires `randomInitialRotation:true` and `resetRotationOnStart:true`. |
+| `initialHeadingSeed` | Presentation random stream | Optional integer. Conditions using the same value draw the same per-rig starting yaw within a sequence cycle. The next cycle draws new headings. Uses the same two reset switches as the heading distribution. |
 | `hexRadius` | Keep scene/current value (10 initially) | Positive grid spacing in world units. |
 | `spacing` | null | Legacy alias, overridden by hexRadius. |
 | `kannadiTilePrefab` | Keep scene prefab | Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe Resources asset. |

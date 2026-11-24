@@ -213,6 +213,7 @@ Replay reads saved animal poses and recorded stimulus evidence. Preserve the com
 | [Data formats](docs/data-formats.md) / [run snapshots](docs/run-config-snapshots.md) | CSVs, clocks, units, original inputs and immutable versions. |
 | [Replay](docs/replay.md) | Saved-run loading, timeline, overview and reconstruction limits. |
 | [Kannadi](docs/kannadi-modernization.md) | Mirror populations, camera routing and software validation history. |
+| [16-rig desert locust experiment](docs/desert-locust-experiment.md) | Blank control, ordered swarm and Kannadi multiplayer in shuffled cycles. |
 | [Experiment phases](docs/experiment-phases.md) | Pre/stimulus/post conditions and heading references. |
 | [Release history](docs/releases.md) | Archival source pins, platform builds and compatibility changes. |
 

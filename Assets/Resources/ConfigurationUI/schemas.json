@@ -14437,6 +14437,81 @@
         },
         "default": null
       },
+      "groundAppearance": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "texture": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "SceneDefault",
+              "Sand",
+              "Grass",
+              "Custom",
+              0,
+              1,
+              2,
+              3
+            ],
+            "default": "SceneDefault"
+          },
+          "groundTexturePath": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "x-ui": {
+              "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+            }
+          },
+          "tilingX": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          },
+          "tilingY": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          }
+        },
+        "default": null
+      },
+      "initialHeadingSeed": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "default": null,
+        "x-ui": {
+          "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+        }
+      },
       "numberOfRings": {
         "type": [
           "integer",
@@ -17518,6 +17593,81 @@
               }
             },
             "default": null
+          },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
           },
           "numberOfRings": {
             "type": [
@@ -21818,6 +21968,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -26116,6 +26341,81 @@
               }
             },
             "default": null
+          },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
           },
           "numberOfRings": {
             "type": [
@@ -31809,6 +32109,81 @@
         },
         "default": null
       },
+      "groundAppearance": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "texture": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "SceneDefault",
+              "Sand",
+              "Grass",
+              "Custom",
+              0,
+              1,
+              2,
+              3
+            ],
+            "default": "SceneDefault"
+          },
+          "groundTexturePath": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "x-ui": {
+              "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+            }
+          },
+          "tilingX": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          },
+          "tilingY": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": 200,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+            }
+          }
+        },
+        "default": null
+      },
+      "initialHeadingSeed": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "default": null,
+        "x-ui": {
+          "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+        }
+      },
       "numberOfRings": {
         "type": [
           "integer",
@@ -34890,6 +35265,81 @@
               }
             },
             "default": null
+          },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
           },
           "numberOfRings": {
             "type": [
@@ -39190,6 +39640,81 @@
             },
             "default": null
           },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
+          },
           "numberOfRings": {
             "type": [
               "integer",
@@ -43488,6 +44013,81 @@
               }
             },
             "default": null
+          },
+          "groundAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "texture": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "enum": [
+                  "SceneDefault",
+                  "Sand",
+                  "Grass",
+                  "Custom",
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                "default": "SceneDefault"
+              },
+              "groundTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null,
+                "x-ui": {
+                  "help": "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay."
+                }
+              },
+              "tilingX": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              },
+              "tilingY": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 200,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count."
+                }
+              }
+            },
+            "default": null
+          },
+          "initialHeadingSeed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "help": "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats."
+            }
           },
           "numberOfRings": {
             "type": [

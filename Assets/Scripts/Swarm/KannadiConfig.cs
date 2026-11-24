@@ -27,6 +27,8 @@ public class KannadiConfig : SwarmConfig
     public bool randomInitialRotation;
     public RandomInitialHeadingDistribution initialHeadingDistribution = RandomInitialHeadingDistribution.Continuous;
     public ColorConfig uniformSkyColor;
+    public LocustGroundConfig groundAppearance;
+    public int? initialHeadingSeed;
     public int? numberOfRings;
     public float? hexRadius;
     public float? spacing; // Legacy name; hexRadius takes precedence.
@@ -99,6 +101,7 @@ public class KannadiConfig : SwarmConfig
         if (!string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase) && !string.Equals(populationMode, "Swarm", StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("populationMode must be Mirror or Swarm.");
         sun?.Validate();
+        groundAppearance?.Validate();
         if (!Enum.IsDefined(typeof(RandomInitialHeadingDistribution), initialHeadingDistribution))
             throw new ArgumentException("initialHeadingDistribution must be Continuous or Cardinal.");
         headingReference?.Validate();

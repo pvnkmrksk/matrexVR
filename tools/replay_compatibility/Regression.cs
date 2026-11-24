@@ -30,7 +30,7 @@ public static class Regression
         string json=Newtonsoft.Json.JsonConvert.SerializeObject(new{rigs=archive.Rigs.Count,rows=archive.Rigs.Values.Sum(samples=>samples.Count),archive.Duration,archive.FirstExperimentTime,contexts=contexts.Length,restoredConfigurations=restored,representativePopulation=agents,warnings=archive.Warnings},Newtonsoft.Json.Formatting.Indented);
         if(report!=null)File.WriteAllText(report,json);Console.WriteLine(json);
     }
-    private static void TextureArchive(string root)
+    private static void TextureArchive(string root, string experiment)
     {
         string profile = Path.Combine(root, "texture-profile"), run = Path.Combine(root, "texture-run");
         Directory.CreateDirectory(profile);
@@ -40,8 +40,7 @@ public static class Regression
         File.WriteAllText(Path.Combine(profile, "system_config.json"), "{}");
         File.WriteAllText(Path.Combine(profile, "sequenceConfig.json"),
             @"{'sequences':[{'parameters':{'configFile':'swarm.json'}}]}");
-        File.WriteAllText(Path.Combine(profile, "swarm.json"),
-            @"{'modelAppearance':{'enabled':false,'textureVariants':[{'name':'Chosen','texturePath':'chosen.png'}],'selectedTextureVariant':'Chosen'}}");
+        File.WriteAllText(Path.Combine(profile, "swarm.json"), experiment);
         var saved = new RunConfigArchive(run, profile, "fixture", "test");
         saved.CaptureStartup("Kannadi");
         File.WriteAllBytes(image, replacement);
@@ -270,7 +269,10 @@ public static class Regression
                 bool rejected=false;try{requiredArchive.RequireComplete();}catch(IOException){rejected=true;}
                 Check(rejected,"optional tracker exclusion keeps missing required "+requiredKind+" dependencies strict");
             }
-            TextureArchive(root);
+            TextureArchive(root,
+                @"{'modelAppearance':{'enabled':false,'textureVariants':[{'name':'Chosen','texturePath':'chosen.png'}],'selectedTextureVariant':'Chosen'}}");
+            string groundTest = Path.Combine(root, "ground");
+            TextureArchive(groundTest, @"{'groundAppearance':{'texture':'Custom','groundTexturePath':'chosen.png','tilingX':200,'tilingY':100}}");
             nativeArchive.CaptureCompanions(new[]{
                 new JObject{["vrId"]="VR1",["backend"]="Rekkefly",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=calibration,["releaseTag"]="local-test",["executableSha256"]=new string('a',64),["demoRequested"]=false,["strictCameraFallback"]=true,["actualInputSource"]="unverified"},
                 new JObject{["vrId"]="VR2",["identityVerified"]=false,["matchesConfiguredRig"]=true,["configFile"]=sidecar},

@@ -105,6 +105,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         {
             NightSkyController.Apply(gameObject, null, null);
             KannadiConfig next = KannadiConfig.Load(parameters);
+            LocustGround.Apply(gameObject.scene, next.groundAppearance);
             Keyboard.ApplyAutopilotConfig(next.autopilotEnabled, next.autopilotSpeed);
             Kannadi[] rigs = FindObjectsOfType<Kannadi>().Where(r => r.isActiveAndEnabled && r.gameObject.scene == gameObject.scene).OrderBy(r => r.VRIndex).ToArray();
             // Validate all prefab selections before replacing any existing grid.
@@ -184,7 +185,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             }
         }
         else if (next.randomInitialRotation && next.resetRotationOnStart)
-            rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(UnityEngine.Random.value), rotation.eulerAngles.z);
+            rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(ExperimentRandom.InitialHeadingSample(next.initialHeadingSeed, VRIndex)), rotation.eulerAngles.z);
         ClosedLoop closedLoop = GetComponent<ClosedLoop>();
         if (closedLoop != null)
         {

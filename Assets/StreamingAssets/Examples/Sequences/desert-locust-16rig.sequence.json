@@ -1,0 +1,41 @@
+{
+  "title": "Desert locust · 16 rigs",
+  "autoStart": false,
+  "loop": true,
+  "randomise": true,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 4318,
+  "returnToSetup": true,
+  "sequences": [
+    {
+      "sceneName": "Kannadi",
+      "duration": 10,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/desert-16rig-blank.experiment.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 10,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/desert-16rig-ordered-swarm.experiment.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 10,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/desert-16rig-kannadi.experiment.json"
+      }
+    }
+  ]
+}
