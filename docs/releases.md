@@ -2,6 +2,10 @@
 
 [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases) is the publication record. A local build or source change is not a published binary. The [website](https://pvnkmrksk.github.io/matrexVR/) discovers real uploaded ZIPs; it never constructs a download URL for an absent asset.
 
+## 0.4.6 — 16-rig desert locust experiment
+
+A ready-to-load sequence shuffles a blank control, an ordered simulated swarm, and Kannadi multiplayer, with ten seconds per condition. Starting poses and the desert background are matched across conditions. The workbench offers sand, grass, custom ground images, and independent X/Y texture tiling. [Release notes](release-notes-0.4.6.md) · [Experiment setup](desert-locust-experiment.md)
+
 ## 0.4.5 — selective auto-trim and star sky replay
 
 - Select a flight rig in the run dashboard to start or stop auto-trim or temporarily bypass its flight check. When a row repeats, it starts with its configured settings. Learned per-rig DC offsets still carry forward.

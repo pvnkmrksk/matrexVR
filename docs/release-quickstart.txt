@@ -1,4 +1,4 @@
-MATREX VR 0.4.5 — SELECTIVE AUTO-TRIM AND STAR SKY REPLAY
+MATREX VR 0.4.6 — 16-RIG DESERT LOCUST EXPERIMENT
 Engine: Unity 6000.3.16f1
 https://github.com/pvnkmrksk/matrexVR
 https://pvnkmrksk.github.io/matrexVR/
@@ -39,7 +39,7 @@ quits the player. For example:
   "./MATREX VR.x86_64" -configure
 
 Full five-minute guide and troubleshooting:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/docs/five-minute-start.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.6/docs/five-minute-start.md
 
 2. CONFIGURE A REAL APPARATUS
 
@@ -65,6 +65,14 @@ Daily work: set animal/experimenter labels and notes under Animal & recording
 details, review the sequence, edit a block's Settings, save the setup and choose
 Start experiment. Each experiment creates a separate run folder. Auto start
 affects the next launch. Plots opens the optional separate Daari Deepa viewer.
+
+For the 16-rig desert experiment, select Desert locust · 16 rigs in the sequence
+picker and use your calibrated VR1–VR16 walking system configuration. Each cycle
+shuffles a blank control, an ordered simulated swarm, and Kannadi multiplayer.
+Each condition runs for ten seconds. Choose a ground texture and independent X/Y
+repeat counts under Appearance → Ground. Add PNG or JPEG files under
+GroundTextures/ in the active configuration folder.
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.6/docs/desert-locust-experiment.md
 
 The supplied Examples include world starters, four terrain-choice treatments,
 swarm/social sequences and custom-model sequences. Settings and Edit JSON share
@@ -163,7 +171,7 @@ connect through stdio with Python 3.11+ and the pinned SDK; uv run --locked --sc
 prepares it. Python is needed only for this optional adapter. The adapter may also be used from the
 matching source checkout's tools/ directory. Prepare dependencies before offline
 experiments. Full client configuration and tool reference:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/docs/ai-control.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.6/docs/ai-control.md
 
 Discover -> read workspace/schema -> edit JSON with its current revision -> save
 and validate -> start -> poll status -> stop -> await finalization -> replay.
@@ -171,7 +179,7 @@ Accepted Start means preparation began, not that a scene or recorder is ready.
 Read is_error results; after timeout inspect actual status before another mutation.
 Re-read stale revisions/conflicts. Quit and relaunch without --control-dir to
 remove the endpoint. Agent/contributor context:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/AGENTS.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.6/AGENTS.md
 
 7. EVERYDAY CONTROLS
 
@@ -207,4 +215,4 @@ For a problem report include OS, exact build, action/error and runtime_trace.log
 
 Detailed manuals, release evidence and limitations:
   https://pvnkmrksk.github.io/matrexVR/manual/
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/docs/releases.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.6/docs/releases.md
