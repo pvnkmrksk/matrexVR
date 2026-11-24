@@ -123,8 +123,8 @@ public sealed partial class ExperimentControlEndpoint
             case "metadata_get":return Setup().ControlMetadata();
             case "metadata_set":return Setup().ControlMetadata(RequiredText(args,"jsonText"),RequiredText(args,"revision"),args["save"]!=null&&RequiredBoolean(args,"save"));
             case "recordings_list":
-                string root=args["directory"]==null?RuntimePaths.RunDataRoot:RequiredPath(args,"directory");
-                return new JObject{["directory"]=root,["entries"]=new JArray(RecordingLibrary.Discover(root).Take(100).Select(entry=>new JObject{
+                string[] roots=args["directory"]==null?RuntimePaths.GetReplayLibraryRoots():new[]{RequiredPath(args,"directory")};
+                return new JObject{["directory"]=roots[0],["directories"]=new JArray(roots),["entries"]=new JArray(RecordingLibrary.Discover(roots).Take(100).Select(entry=>new JObject{
                     ["id"]=entry.Id,["directory"]=entry.DirectoryPath,["title"]=entry.Title,["state"]=entry.RecordingState,["indexed"]=entry.Indexed,["error"]=entry.Error})),
                     ["note"]="Discovery is a preview; replay_open performs full archive loading and validation."};
             case "runtime_control":

@@ -2,6 +2,12 @@ namespace UnityEngine
 {
     public enum RuntimeInitializeLoadType { SubsystemRegistration,BeforeSceneLoad }
     public sealed class RuntimeInitializeOnLoadMethodAttribute : System.Attribute { public RuntimeInitializeOnLoadMethodAttribute(RuntimeInitializeLoadType type){} }
+    public static class Application
+    {
+        public static bool isEditor;
+        public static string version="0.3.1-dev", unityVersion="fixture-unity", buildGUID="actual-player-guid", streamingAssetsPath;
+        public static string persistentDataPath => System.IO.Path.GetTempPath();
+    }
     public struct Vector3
     {
         public float x,y,z;

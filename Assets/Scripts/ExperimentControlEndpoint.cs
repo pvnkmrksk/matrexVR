@@ -118,6 +118,7 @@ public sealed partial class ExperimentControlEndpoint : MonoBehaviour
     {
         var main = MainController.Instance; var gui = ConfigWorkbench.Instance;
         var replay = FindFirstObjectByType<ReplayController>();
+        var replayProgress = replay?.CurrentLoadWork;
         switch (method)
         {
             case "status": return new JObject {
@@ -129,7 +130,13 @@ public sealed partial class ExperimentControlEndpoint : MonoBehaviour
                 ["sequenceTitle"] = main?.SequenceTitle, ["phase"] = MainController.RecordedExperimentPhase, ["sequenceError"] = main?.SequenceError,
                 ["setupOpen"] = gui != null, ["unsavedDraft"] = gui?.ControlHasUnsavedDraft ?? false, ["setupModal"] = gui?.ControlHasModal ?? false,
                 ["replayReady"] = replay?.Ready ?? false, ["replayLoading"]=replay?.Loading??false,["replayError"]=replay?.LoadError, ["replayTime"] = replay?.ReplayTime ?? 0, ["replayDuration"] = replay?.Duration ?? 0,
-                ["replayPlaying"] = replay?.IsPlaying ?? false, ["diagnostics"]=DetailedStatus() };
+                ["replayPlaying"] = replay?.IsPlaying ?? false, ["replayLoadProgress"] = replayProgress?.Message ?? replay?.LoadProgress,
+                ["replayLoadProgressFraction"] = replayProgress?.Fraction, ["replayLoadProgressCompleted"] = replayProgress?.Completed,
+                ["replayLoadProgressTotal"] = replayProgress?.Total, ["replayLoadProgressUnit"] = replayProgress?.Unit,
+                ["replayAnimalCount"] = replay?.AnimalCount ?? 0, ["replayPopulationTrackCount"] = replay?.PopulationRecordingCount ?? 0,
+                ["replayPoseCacheHits"] = replay?.Session?.PoseCacheHits ?? 0,
+                ["replayVisiblePopulationCount"] = replay?.VisiblePopulationCount ?? 0,
+                ["replayWarnings"] = new JArray(replay?.Session?.Warnings ?? Enumerable.Empty<string>()), ["diagnostics"]=DetailedStatus() };
             case "validate":
                 RequireIdle();
                 var workspace = new ConfigWorkspace(RequiredPath(args, "systemFile"), RequiredPath(args, "sequenceFile"), ConfigSchema.Load());

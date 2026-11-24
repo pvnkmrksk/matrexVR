@@ -56,6 +56,39 @@ public static class Regression
         Reject(() => new ReplaySessionArchive(run).Resolve("chosen.png"), "Replay rejects a modified texture snapshot");
     }
 
+    private static void ReplayPoseCache(string root)
+    {
+        string run = Path.Combine(root, "pose-cache-run"), cache = Path.Combine(root, "external-pose-cache");
+        Directory.CreateDirectory(run);
+        string csv = Path.Combine(run, "animal.csv");
+        File.WriteAllText(csv, Header + "\n" + Row("10:00:00.000", "VR1 Kannadi", "Kannadi", 0, 3, 31) + "\n" +
+            Row("10:00:01.500", "VR1 Kannadi", "Kannadi", 1, 7, 42) + "\n");
+        byte[] source = File.ReadAllBytes(csv);
+        var first = new ReplaySessionArchive(run);
+        first.LoadRigSamples(default, cache);
+        string index = Directory.GetFiles(cache, "*.matpose").Single();
+        var warm = new ReplaySessionArchive(run);
+        warm.LoadRigSamples(default, cache);
+        var reference = first.Rigs["VR1"];
+        var decoded = warm.Rigs["VR1"];
+        Check(first.PoseCacheHits == 0 && warm.PoseCacheHits == 1, "A second replay must reuse the external pose index");
+        Check(decoded.Select(p => (p.timestampTicks, p.time, p.position.x, p.rotation.y, p.recordedRigName, p.ContextKey))
+            .SequenceEqual(reference.Select(p => (p.timestampTicks, p.time, p.position.x, p.rotation.y, p.recordedRigName, p.ContextKey))),
+            "The pose index must preserve the recorded transform, time and scene context");
+        File.WriteAllText(index, "corrupt index");
+        var recovered = new ReplaySessionArchive(run);
+        recovered.LoadRigSamples(default, cache);
+        Check(recovered.PoseCacheHits == 0 && recovered.Rigs["VR1"].Count == 2, "A corrupt local index must fall back to the CSV");
+        var rebuilt = new ReplaySessionArchive(run);
+        rebuilt.LoadRigSamples(default, cache);
+        Check(rebuilt.PoseCacheHits == 1, "Successful CSV fallback must rebuild a valid external index");
+        string internalCache = Path.Combine(run, "bad-cache-location");
+        var guarded = new ReplaySessionArchive(run);
+        guarded.LoadRigSamples(default, internalCache);
+        Check(!Directory.Exists(internalCache) && File.ReadAllBytes(csv).SequenceEqual(source),
+            "Pose indexing must leave the archive directory and source CSV bytes alone");
+    }
+
     private static string Row(string time,string rig,string scene,int step,int x,int yaw,string config="choice.json")=>
         "2026-01-01 "+time+","+rig+","+scene+","+step+","+config+","+x+",0,0,0,"+yaw+",0,0,condition,stimulus,";
     private static void Gzip(string path,string text)
@@ -77,6 +110,7 @@ public static class Regression
             File.WriteAllText(setup,Header+"\n"+Row("09:00:00.000","VR99","ControlScene",0,999,0)+"\n"+Row("12:00:00.000","VR99","ReplayScene",0,999,0)+"\n");
             byte[] setupBytes=File.ReadAllBytes(setup);
             var archive=new ReplaySessionArchive(root);archive.LoadRigSamples();
+            ReplayPoseCache(root);
             Check(archive.Rigs.Count==2,"both animal IDs load, including VR5");
             Check(archive.Rigs["VR1"].Count==4,"all scene CSVs append to the animal track");
             Check(archive.Duration==10 && archive.Rigs["VR1"][2].time==9,"per-file timestamp origins must not overlap scene logs");

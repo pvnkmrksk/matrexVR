@@ -177,6 +177,46 @@ class McpPackagingTests(unittest.TestCase):
                     builder.stage_mcp_adapter(stage, "Linux", revision)
             self.assertFalse(stage.exists())
 
+    def test_linux_package_stages_pinned_launcher_and_guide_only(self):
+        with tempfile.TemporaryDirectory(prefix="matrex-launcher-package-") as folder:
+            output = Path(folder)
+            root = output / "repo"
+            original_launcher = (builder.ROOT / builder.LINUX_LAUNCHER).read_bytes()
+            guide = b"# Recording guide\n"
+            revision = self.fixture(root, {builder.LINUX_LAUNCHER: original_launcher, builder.RUN_DATA_GUIDE: guide})
+            (root / builder.LINUX_LAUNCHER).write_text("unreviewed working tree bytes\n")
+            project = output / "project"
+            bundled_guide = project / builder.RUN_DATA_GUIDE
+            bundled_guide.parent.mkdir(parents=True)
+            bundled_guide.write_bytes(guide)
+            build = output / "build"
+            build.mkdir()
+            executable = build / builder.TARGETS["Linux"][2]
+            executable.write_text("player")
+            (build / "build-report.json").write_text(json.dumps({"result": "Succeeded", "errors": 0}))
+            (build / "RunData").mkdir()
+            (build / "RunData" / "recording.csv").write_text("private fixture")
+            quickstart = output / "quickstart.txt"
+            quickstart.write_text("fixture quickstart\n")
+            with patch.object(builder, "ROOT", root):
+                builder.package(build, output, "0.5.0", "Linux", revision, project, quickstart,
+                                with_companions=False, with_dashboard=False)
+            archive, = output.glob("*.zip")
+            with zipfile.ZipFile(archive) as zipped:
+                prefix = archive.stem + "/"
+                launcher = zipped.getinfo(prefix + "Open MATREX VR.sh")
+                self.assertEqual(zipped.read(launcher), original_launcher)
+                self.assertTrue((launcher.external_attr >> 16) & 0o111)
+                self.assertEqual(zipped.read(prefix + "RUN-DATA.md"), guide)
+                self.assertTrue(all("/RunData/" not in path for path in zipped.namelist()))
+                manifest = json.loads(zipped.read(prefix + "release-manifest.json"))
+                for entry in manifest["desktopFiles"]:
+                    self.assertEqual(entry["sha256"], hashlib.sha256(zipped.read(prefix + entry["path"])).hexdigest())
+            stage = output / archive.stem
+            printed = subprocess.check_output(["bash", stage / "Open MATREX VR.sh", "--show-paths"], text=True)
+            self.assertIn(f"RunData: {stage / 'RunData'}", printed)
+            self.assertFalse((stage / "RunData").exists())
+
 
 class VerifiedNativeReuseTests(unittest.TestCase):
     def fixture(self, root):

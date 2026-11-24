@@ -12,6 +12,8 @@ using System.Text;
 public static class ReplayFolderPicker
 {
     public static Task<string> ChooseAsync() => ChoosePathAsync("Open saved experiment run", "Open run", RuntimePaths.RunDataRoot, null);
+    public static Task<string> ChooseLibraryAsync(string initialDirectory) =>
+        ChoosePathAsync("Open saved run or recording library", "Open folder", initialDirectory ?? RuntimePaths.RunDataRoot, null);
     public static Task<string> ChooseMediaAsync() => ChoosePathAsync("Import tracker recording", "Choose recording", RuntimePaths.RunDataRoot, null);
     public static Task<string> ChooseFileAsync(string title, string initialDirectory, string extension) =>
         ChoosePathAsync(title, "Open file", initialDirectory, extension ?? "");

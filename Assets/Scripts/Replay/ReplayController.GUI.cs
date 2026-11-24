@@ -91,6 +91,7 @@ public partial class ReplayController
 
     private bool showRunPicker,showReplayHelp,showReplayTrails;
     private GUIStyle replayEyebrow,replayContext,replaySession,replayClock;
+    private GUIStyle replayLoadPercent;
     private static Rect ReplayHeaderRect(float width,float height,float scale)
         => new Rect(12*scale,12*scale,Mathf.Min(660*scale,Mathf.Max(280*scale,width-420*scale)),78*scale);
     private static Rect ReplayViewportRect(float width,float height,float scale)
@@ -141,6 +142,7 @@ public partial class ReplayController
         replaySession=new GUIStyle(titleStyle){fontSize=P(16),fontStyle=FontStyle.Bold,clipping=TextClipping.Clip,wordWrap=false};
         replayContext=new GUIStyle(smallStyle){fontSize=P(12),wordWrap=false,clipping=TextClipping.Clip};
         replayClock=new GUIStyle(replaySkin.label){fontSize=P(14),alignment=TextAnchor.MiddleCenter};
+        replayLoadPercent=new GUIStyle(replayContext){alignment=TextAnchor.MiddleRight};
     }
     private void OnGUI()
     {
@@ -214,7 +216,12 @@ public partial class ReplayController
         if(archive==null || loading)
         {
             GUI.Label(new Rect(left,top,width,row),loading?"Preparing the saved experiment…":"Choose a recording to begin",titleStyle);
-            GUI.Label(new Rect(left,top+38*scale,width,64*scale),!string.IsNullOrEmpty(LoadError)?LoadError:loading?loadProgress:"Open a recorded run above. Replay reads its saved poses, scene configuration and available tracker footage.",smallStyle);return;
+            if (loading && string.IsNullOrEmpty(LoadError))
+                DrawReplayLoadProgress(left, top+38*scale, Mathf.Min(width, 720*scale), scale);
+            else
+                GUI.Label(new Rect(left,top+38*scale,width,64*scale),LoadError ??
+                    "Open a recorded run above. Replay reads its saved poses, scene configuration and available tracker footage.",smallStyle);
+            return;
         }
         GUI.enabled=folderPicker==null && mediaPanel?.HasModal!=true;
         playContent.text=isPlaying?"Pause":"Play";Rect playRect=ReplayControlRect(ref x,top,82*scale,row,6*scale);
@@ -249,6 +256,37 @@ public partial class ReplayController
         else if(recordedDashboard!=null)GUI.Label(new Rect(left,area.yMax-24*scale,width-336*scale,20*scale),recordedDashboard.Error??recordedDashboard.Status,smallStyle);
         else GUI.Label(new Rect(left,area.yMax-24*scale,width-336*scale,20*scale),followedRig!=null?"Following "+followedRig+" · click empty space to release": "Space to play/pause · Drag timeline to seek · Click an animal to follow",smallStyle);
         GUI.enabled=true;
+    }
+    private void DrawReplayLoadProgress(float left, float top, float width, float scale)
+    {
+        var work = loadProgress;
+        double? fraction = work?.Fraction;
+        float percentWidth = fraction.HasValue ? 52*scale : 0;
+        GUI.Label(new Rect(left, top, width-percentWidth, 20*scale), work?.Message ?? "", replayContext);
+        if (fraction.HasValue)
+        {
+            int percent = (int)Math.Floor(100 * fraction.Value);
+            GUI.Label(new Rect(left+width-percentWidth, top, percentWidth, 20*scale), percent+"%", replayLoadPercent);
+        }
+        if (Event.current.type != EventType.Repaint) return;
+
+        var track = new Rect(left, top+26*scale, width, 8*scale);
+        Color previous = GUI.color;
+        GUI.color = new Color32(45,63,80,255);
+        GUI.DrawTexture(track, Texture2D.whiteTexture);
+        GUI.color = new Color32(72,187,172,255);
+        if (fraction.HasValue)
+        {
+            var fill = new Rect(track.x, track.y, track.width*(float)fraction.Value, track.height);
+            if (fill.width > 0) GUI.DrawTexture(fill, Texture2D.whiteTexture);
+        }
+        else
+        {
+            float span = track.width*.22f;
+            float offset = Mathf.PingPong(Time.realtimeSinceStartup*.6f,1f)*(track.width-span);
+            GUI.DrawTexture(new Rect(track.x+offset,track.y,span,track.height), Texture2D.whiteTexture);
+        }
+        GUI.color = previous;
     }
     private void DrawReplayRunPicker(float scale)
     {

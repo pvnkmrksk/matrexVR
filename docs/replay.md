@@ -2,7 +2,7 @@
 
 The saved-run replay path loads evidence from a **saved run folder**: animal poses, saved sequence/system/experiment files, archived sky images and recorded population poses. The current workspace opens with the **God’s-eye view** alongside a grid of synchronized first-person feeds. It does not substitute today's installed config for an absent historical file.
 
-**For 0.4.1, keep the creating player build with the complete run.** New-contract recordings require the exact build identity and complete, hash-verified configurations, models and journals. A changed build or missing required evidence is an error. Older reconstruction paths have their recorded limits; see the [same-build contract](same-build-replay-contract.md).
+**Keep the creating player build with the complete run.** Current interactive playback also accepts explicitly supported earlier builds. It uses saved configurations and journals and reports missing tracks or incomplete evidence in a partial copy. See the [replay contract](same-build-replay-contract.md) and the [run folder guide](../Assets/StreamingAssets/RunData_README.md).
 
 ## Open a run
 
@@ -14,7 +14,9 @@ In 0.4.1, choose **Replay** from the setup sidebar to open **Replay recordings**
 
 Select a recording to inspect **Recorded files** and **Saved evidence & limitations**, then choose **Replay selected**. This saves the current setup draft before opening the saved run. A finishing recording remains unavailable until its data writers have closed; other recordings can still be opened. Use **Refresh** to rescan or search by name, animal, backend or recorded scene. **Browse…** and **Open an external folder path → Inspect folder** open a recording on another drive or computer without moving it into the local library.
 
-The combined Smoothed Walking Linux package opens finalized runs from the previous Smoothed Walking player and recordings from its own acquisition build. Its launcher adds the earlier RunData folder to the Replay library with `--replay-library-dir`. The player verifies each recording before playback.
+The loading bar reports the current stage while Replay reads animal poses, indexes scene frames, matches rigs to the scene and indexes population files. The bar remains active through first scene restoration. A first open can build a local animal-pose cache from the CSV. Later opens reuse the cache when the recording evidence still matches.
+
+The combined Smoothed Walking Linux package opens finalized runs from the previous Smoothed Walking player and recordings from its own acquisition build. Its launcher adds the earlier RunData folder to the Replay library with `--replay-library-dir`.
 
 You can also launch a player with:
 

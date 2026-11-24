@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -7,10 +9,12 @@ using UnityEngine;
 /// <summary>Editable experiments and recordings live outside installed application bundles.</summary>
 public static class RuntimePaths
 {
+    private const string RunDataGuide = "RunData_README.md";
     private static string configRoot, runDataRoot;
     public static string ConfigRoot { get { Initialize(); return configRoot; } }
     public static string RunDataRoot { get { Initialize(); return runDataRoot; } }
-    internal static string ReplayLibraryRoot => Argument("--replay-library-dir");
+    public static string[] GetReplayLibraryRoots(string activeRoot = null) => FindReplayLibraryRoots(activeRoot ?? RunDataRoot,
+        Argument("--replay-library-dir"), Application.dataPath, Application.persistentDataPath, Application.isEditor);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset() { configRoot = null; runDataRoot = null; }
@@ -37,6 +41,9 @@ public static class RuntimePaths
             !File.Exists(Path.Combine(configs, "sequenceConfig.json"));
         Directory.CreateDirectory(configs);
         Directory.CreateDirectory(data);
+        if (!Application.isEditor && !File.Exists(Path.Combine(data, "recording_manifest.json")) &&
+            !File.Exists(Path.Combine(data, "config_manifest.json")))
+            CopyRunDataReadme(data);
         if (!Application.isEditor && Path.GetFullPath(configs) != Path.GetFullPath(Application.streamingAssetsPath))
         {
             // Seed missing files only. An application update must never overwrite the operator's JSON.
@@ -57,21 +64,28 @@ public static class RuntimePaths
         if (!Application.isEditor && freshProfile) DesktopQuickStart.SeedFreshProfile(configs);
     }
 
+    internal static void CopyRunDataReadme(string directory)
+    {
+        string source = Path.Combine(Application.streamingAssetsPath, RunDataGuide);
+        string destination = Path.Combine(directory, "README.md");
+        try
+        {
+            if (File.Exists(source) && !File.Exists(destination))
+                File.Copy(source, destination, overwrite: false);
+        }
+        catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is System.Security.SecurityException)
+        { /* Optional documentation must never block recording. */ }
+    }
+
     // Keep each installed player's recordings together, outside its signed bundle.
     // Protected installation directories use a stable per-installation fallback.
     public static string DefaultRecordingRoot(string dataPath, string persistentPath, bool editor)
     {
         if (editor) return Path.Combine(dataPath, "RunData");
-        string canonical = Path.GetFullPath(dataPath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var directory = new DirectoryInfo(canonical);
-        var bundle = directory;
-        while (bundle != null && !bundle.Name.EndsWith(".app", StringComparison.OrdinalIgnoreCase)) bundle = bundle.Parent;
-        string parent = bundle?.Parent?.FullName ?? directory.Parent?.FullName;
-        string name = bundle == null ? directory.Name : Path.GetFileNameWithoutExtension(bundle.Name);
-        if (name.EndsWith("_Data", StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 5);
-        if (!string.IsNullOrEmpty(parent))
+        var (installation, _) = PlayerInstallation(dataPath);
+        if (installation.Parent != null)
         {
-            string local = Path.Combine(parent, name + " RunData");
+            string local = Path.Combine(installation.Parent.FullName, "RunData");
             try
             {
                 Directory.CreateDirectory(local);
@@ -82,6 +96,67 @@ public static class RuntimePaths
             catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is System.Security.SecurityException)
             { /* Read-only installations still need a writable, isolated library. */ }
         }
+        return ProtectedRecordingRoot(dataPath, persistentPath);
+    }
+
+    internal static string[] FindReplayLibraryRoots(string active, string previous, string dataPath, string persistentPath, bool editor)
+    {
+        var comparer = Path.DirectorySeparatorChar == '\\' ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        var roots = new List<string> { active };
+        if (!string.IsNullOrEmpty(previous)) roots.Add(previous);
+        if (editor) return roots.Distinct(comparer).ToArray();
+
+        var (installation, name) = PlayerInstallation(dataPath);
+        var playerParent = installation.Parent;
+        if (playerParent != null)
+        {
+            AddLayouts(playerParent.FullName);
+            // Versioned desktop players often sit beside each other in the same workspace.
+            // Only inspect matching player installations and their two known recording locations.
+            if (playerParent.Parent != null)
+                try
+                {
+                    foreach (var sibling in playerParent.Parent.EnumerateDirectories())
+                    {
+                        if (comparer.Equals(sibling.FullName, playerParent.FullName) ||
+                            !Directory.Exists(Path.Combine(sibling.FullName, installation.Name))) continue;
+                        AddLayouts(sibling.FullName);
+                    }
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+        }
+        AddIfPresent(ProtectedRecordingRoot(dataPath, persistentPath));
+        AddIfPresent(Path.Combine(persistentPath, "RunData"));
+        return roots.Select(path => Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+            .Distinct(comparer).ToArray();
+
+        void AddLayouts(string parent)
+        {
+            AddIfPresent(Path.Combine(parent, "RunData"));
+            AddIfPresent(Path.Combine(parent, name + " RunData"));
+        }
+
+        void AddIfPresent(string path)
+        {
+            if (Directory.Exists(path)) roots.Add(path);
+        }
+    }
+
+    private static (DirectoryInfo directory, string name) PlayerInstallation(string dataPath)
+    {
+        var directory = new DirectoryInfo(Path.GetFullPath(dataPath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        for (var bundle = directory; bundle != null; bundle = bundle.Parent)
+            if (bundle.Name.EndsWith(".app", StringComparison.OrdinalIgnoreCase))
+                return (bundle, Path.GetFileNameWithoutExtension(bundle.Name));
+        string name = directory.Name;
+        if (name.EndsWith("_Data", StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 5);
+        return (directory, name);
+    }
+
+    private static string ProtectedRecordingRoot(string dataPath, string persistentPath)
+    {
+        string canonical = Path.GetFullPath(dataPath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         using (var hash = SHA256.Create())
         {
             string identity = BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(canonical))).Replace("-", "").Substring(0, 16).ToLowerInvariant();

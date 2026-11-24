@@ -34,7 +34,8 @@ public sealed class RecordingSessionFinalizer
 
     public Task<JObject> FinalizeAsync(string endReason, Func<CancellationToken, Task> drain,
         Func<CancellationToken, Task<JObject>> media, Func<JArray> writerEvidence,
-        Action<string, string[], string[]> observePose = null, string[] closeErrors = null)
+        Action<string, string[], string[]> observePose = null, string[] closeErrors = null,
+        string replayPoseCacheRoot = null)
     {
         lock (gate)
         {
@@ -53,7 +54,7 @@ public sealed class RecordingSessionFinalizer
                     await drain(cancellation.Token).ConfigureAwait(false); drained = true;
                     writers = writerEvidence?.Invoke() ?? new JArray();
                     cancellation.Token.ThrowIfCancellationRequested();
-                    summary = RecordingSummary.Scan(directory, true, cancellation.Token, observePose, true, writers);
+                    summary = RecordingSummary.Scan(directory, true, cancellation.Token, observePose, true, writers, replayPoseCacheRoot);
                     summary["writerEvidence"] = writers;
                     JObject receipt = await media(cancellation.Token).ConfigureAwait(false);
                     cancellation.Token.ThrowIfCancellationRequested();

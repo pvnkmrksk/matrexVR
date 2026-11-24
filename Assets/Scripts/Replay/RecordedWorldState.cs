@@ -304,13 +304,18 @@ public sealed class RecordedWorldStateReader : IDisposable
     private readonly Dictionary<string,Dictionary<string,List<Entry>>> targets = new Dictionary<string,Dictionary<string,List<Entry>>>(StringComparer.Ordinal);
     private readonly Dictionary<long,CachedRow> cache = new Dictionary<long,CachedRow>();
     private readonly LinkedList<long> recency = new LinkedList<long>();
+    private readonly byte[] readBuffer = new byte[65536];
+    private readonly MemoryStream longLine = new MemoryStream();
+    private int bufferStart, bufferEnd;
     private long cachedBytes;
     private bool disposed;
     public int CachedRows => cache.Count;
     public long CachedSerializedBytes => cachedBytes;
     public long ParsedRowCount { get; private set; }
+    public int LastFrame { get; private set; } = -1;
 
-    public RecordedWorldStateReader(string directory, CancellationToken cancellation = default)
+    public RecordedWorldStateReader(string directory, CancellationToken cancellation = default, bool allowInterruptedTail = false,
+        Action<long, long> reportProgress = null)
     {
         this.cancellation = cancellation;
         cancellation.ThrowIfCancellationRequested();
@@ -321,14 +326,26 @@ public sealed class RecordedWorldStateReader : IDisposable
         stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         try
         {
-            while (stream.Position < sourceLength)
+            const long ProgressInterval = 1024 * 1024;
+            long nextProgress = ProgressInterval;
+            reportProgress?.Invoke(0, sourceLength);
+            while (ReadPosition < sourceLength)
             {
                 cancellation.ThrowIfCancellationRequested();
-                long offset = stream.Position;
-                var value = ParseVerified(ReadLine());
+                long offset = ReadPosition;
+                if (reportProgress != null && offset >= nextProgress)
+                {
+                    reportProgress(offset, sourceLength);
+                    nextProgress = offset + ProgressInterval;
+                }
+                string line = ReadLine(out bool terminated);
+                JObject value;
+                try { value = ParseVerified(line); }
+                catch (InvalidDataException) when (allowInterruptedTail && !terminated) { break; }
                 string id = (string)value["presentationId"];
                 if (string.IsNullOrEmpty(id)) throw new InvalidDataException("Configured-world frame has no presentation identity.");
                 var entry = new Entry { Frame = (int)value["frame"], Offset = offset };
+                LastFrame = Math.Max(LastFrame, entry.Frame);
                 if (!frames.TryGetValue(id, out var list)) frames[id] = list = new List<Entry>();
                 if (list.Count > 0 && list[list.Count - 1].Frame >= entry.Frame)
                     throw new InvalidDataException("Configured-world frame indices must increase within each presentation.");
@@ -351,8 +368,9 @@ public sealed class RecordedWorldStateReader : IDisposable
             }
             if (frames.Count == 0) throw new InvalidDataException("Configured-world frame evidence is empty.");
             EnsureSourceUnchanged();
+            reportProgress?.Invoke(sourceLength, sourceLength);
         }
-        catch { stream.Dispose(); throw; }
+        catch { stream.Dispose(); longLine.Dispose(); throw; }
     }
 
     private void EnsureSourceUnchanged()
@@ -363,17 +381,41 @@ public sealed class RecordedWorldStateReader : IDisposable
         if (!info.Exists || info.Length != sourceLength || info.LastWriteTimeUtc != sourceWriteTime)
             throw new InvalidDataException("Configured-world source changed after it was indexed; reload the recording.");
     }
-    private string ReadLine()
+    private long ReadPosition => stream.Position - (bufferEnd - bufferStart);
+
+    private string ReadLine(out bool terminated)
     {
-        var bytes = new List<byte>();
-        int value;
-        while ((value = stream.ReadByte()) >= 0 && value != '\n')
+        longLine.SetLength(0);
+        while (true)
         {
-            if ((bytes.Count & 65535) == 0) cancellation.ThrowIfCancellationRequested();
-            if (bytes.Count >= MaximumLineBytes) throw new InvalidDataException("Configured-world frame exceeds 64 MiB.");
-            bytes.Add((byte)value);
+            if (bufferStart == bufferEnd)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                bufferStart = 0;
+                bufferEnd = stream.Read(readBuffer, 0, readBuffer.Length);
+                if (bufferEnd == 0)
+                {
+                    terminated = false;
+                    return Encoding.UTF8.GetString(longLine.GetBuffer(), 0, (int)longLine.Length);
+                }
+            }
+            int newline = Array.IndexOf(readBuffer, (byte)'\n', bufferStart, bufferEnd - bufferStart);
+            int count = (newline >= 0 ? newline : bufferEnd) - bufferStart;
+            if (longLine.Length + count > MaximumLineBytes) throw new InvalidDataException("Configured-world frame exceeds 64 MiB.");
+            if (newline >= 0 && longLine.Length == 0)
+            {
+                string line = Encoding.UTF8.GetString(readBuffer, bufferStart, count);
+                bufferStart = newline + 1;
+                terminated = true;
+                return line;
+            }
+            longLine.Write(readBuffer, bufferStart, count);
+            bufferStart += count;
+            if (newline < 0) continue;
+            bufferStart++;
+            terminated = true;
+            return Encoding.UTF8.GetString(longLine.GetBuffer(), 0, (int)longLine.Length);
         }
-        return Encoding.UTF8.GetString(bytes.ToArray());
     }
     private static JObject ParseVerified(string line)
     {
@@ -385,7 +427,8 @@ public sealed class RecordedWorldStateReader : IDisposable
         if (cache.TryGetValue(entry.Offset, out var hit))
         { recency.Remove(hit.Recency); recency.AddLast(hit.Recency); return hit.Value; }
         stream.Position = entry.Offset;
-        string line = ReadLine();
+        bufferStart = bufferEnd = 0;
+        string line = ReadLine(out _);
         var value = ParseVerified(line);
         ParsedRowCount++;
         long bytes = Encoding.UTF8.GetByteCount(line);
@@ -428,6 +471,29 @@ public sealed class RecordedWorldStateReader : IDisposable
         var entry=At(list,frame);
         if(entry==null||entry.Frame!=frame)throw new InvalidDataException("Required configured-world rendered frame is missing: "+frame);
     }
+    public void RequireFrames(IReadOnlyList<ReplaySessionArchive.Sample> samples)
+    {
+        string id = null;
+        List<Entry> list = null;
+        int index = 0;
+        for (int i = 0; i < samples.Count; i++)
+        {
+            if ((i & 4095) == 0) cancellation.ThrowIfCancellationRequested();
+            var sample = samples[i];
+            if (list == null || id != sample.presentationId)
+            {
+                id = sample.presentationId;
+                if (!frames.TryGetValue(id, out list)) throw new InvalidDataException("No configured-world frame matches this presentation.");
+                var match = At(list, sample.unityFrame);
+                index = match == null ? 0 : list.BinarySearch(match, FrameOrder);
+            }
+            while (index < list.Count && list[index].Frame < sample.unityFrame) index++;
+            if (index == list.Count || list[index].Frame != sample.unityFrame)
+                throw new InvalidDataException("Required configured-world rendered frame is missing: " + sample.unityFrame);
+        }
+    }
+
+    private static readonly IComparer<Entry> FrameOrder = Comparer<Entry>.Create((a, b) => a.Frame.CompareTo(b.Frame));
     public JObject Apply(string id, int frame, IEnumerable<RecordedWorldStateTarget> live)
     {
         EnsureSourceUnchanged();
@@ -454,6 +520,6 @@ public sealed class RecordedWorldStateReader : IDisposable
     public void Dispose()
     {
         if (disposed) return;
-        disposed = true; cache.Clear(); recency.Clear(); cachedBytes = 0; stream.Dispose();
+        disposed = true; cache.Clear(); recency.Clear(); cachedBytes = 0; stream.Dispose(); longLine.Dispose();
     }
 }

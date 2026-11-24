@@ -76,7 +76,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
 
     public void BeginSession(ReplaySessionArchive session,IEnumerable<string> ids,RecordedWorldStateReader frames=null)
     {
-        session.RequireCompatibleBuild();
+        if (!session.PlaybackPrepared) session.RequireCompatibleBuild();
         worldFrames?.Dispose();worldFrames=frames??(session.Presentations.IsCurrentContract?new RecordedWorldStateReader(session.DirectoryPath):null);
         archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=currentVisualConfig=currentPresentation=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
         periodicViewArenaSize = null;

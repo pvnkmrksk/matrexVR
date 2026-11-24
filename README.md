@@ -56,7 +56,7 @@ Use [published desktop archives](https://github.com/pvnkmrksk/matrexVR/releases)
 
 For real acquisition, use **Configure** for tracker input, displays and LED geometry; review input/calibration in the native tracker, set session labels, then save the setup and start. The demo does not calibrate an apparatus.
 
-[Installation & paths](docs/getting-started.md) · [Connect a tracker](docs/tracker-integration.md) · [Configuration reference](docs/configuration-reference.md) · [Replay a run](docs/replay.md)
+[Installation & paths](docs/getting-started.md) · [Connect a tracker](docs/tracker-integration.md) · [Configuration reference](docs/configuration-reference.md) · [Replay a run](docs/replay.md) · [Read recording files](Assets/StreamingAssets/RunData_README.md)
 
 ### Build a local macOS preview
 

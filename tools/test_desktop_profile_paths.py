@@ -48,13 +48,23 @@ public static class Regression {
         string installations=Path.Combine(Path.GetDirectoryName(profile),"installations-"+kind);
         string macData=Path.Combine(installations,"first","MATREX VR.app","Contents");
         string macRuns=RuntimePaths.DefaultRecordingRoot(macData,profile,false);
-        Check(macRuns==Path.Combine(installations,"first","MATREX VR RunData"),"Mac data must be beside the bundle");
+        Check(macRuns==Path.Combine(installations,"first","RunData"),"Mac data must be in RunData beside the bundle");
         string secondRuns=RuntimePaths.DefaultRecordingRoot(Path.Combine(installations,"second","MATREX VR.app","Contents"),profile,false);
         Check(macRuns!=secondRuns,"two installations must not share recording libraries");
         string windowsRuns=RuntimePaths.DefaultRecordingRoot(Path.Combine(installations,"windows","MATREX VR_Data"),profile,false);
-        Check(windowsRuns==Path.Combine(installations,"windows","MATREX VR RunData"),"Windows/Linux data must be beside player data directory");
+        Check(windowsRuns==Path.Combine(installations,"windows","RunData"),"Windows/Linux data must be in RunData beside the player");
+        string oldNamedRoot=Path.Combine(installations,"first","MATREX VR RunData");
+        string previousProfileRoot=Path.Combine(profile,"RunData");
+        Directory.CreateDirectory(oldNamedRoot);
+        Directory.CreateDirectory(previousProfileRoot);
+        string oldRecording=Path.Combine(oldNamedRoot,"saved.csv");File.WriteAllText(oldRecording,"original bytes");
+        string[] library=RuntimePaths.FindReplayLibraryRoots(macRuns,null,macData,profile,false);
+        Check(Array.IndexOf(library,macRuns)==0,"active RunData must lead replay discovery");
+        Check(Array.IndexOf(library,oldNamedRoot)>=0,"replay must discover old named recording folders without making them the new target");
+        Check(Array.IndexOf(library,previousProfileRoot)>=0,"replay must discover older shared profile recordings");
+        Check(File.ReadAllText(oldRecording)=="original bytes","discovery modified the old recording");
         string protectedParent=Path.Combine(installations,"protected");Directory.CreateDirectory(protectedParent);
-        File.WriteAllText(Path.Combine(protectedParent,"MATREX VR RunData"),"read-only-install simulation");
+        File.WriteAllText(Path.Combine(protectedParent,"RunData"),"read-only-install simulation");
         string protectedData=Path.Combine(protectedParent,"MATREX VR.app","Contents");
         string fallback=RuntimePaths.DefaultRecordingRoot(protectedData,profile,false);
         Check(fallback.StartsWith(Path.Combine(profile,"Installations")),"unwritable installation must have a scoped fallback");
@@ -66,6 +76,14 @@ public static class Regression {
         UnityEngine.Application.dataPath=Path.GetDirectoryName(assets);
         Check(RuntimePaths.ConfigRoot==Path.GetFullPath(profile),"wrong config root");
         Check(RuntimePaths.RunDataRoot==Path.GetFullPath(args[3]),"wrong recording root");
+        string guide=Path.Combine(args[3],"README.md");
+        Check(File.Exists(guide)==(kind!="editor"),"standalone RunData must contain the bundled guide");
+        if(kind!="editor") {
+            Check(File.ReadAllText(guide)=="recording guide\n","RunData guide differs from the bundled bytes");
+            File.WriteAllText(guide,"existing operator guide");
+            RuntimePaths.CopyRunDataReadme(args[3]);
+            Check(File.ReadAllText(guide)=="existing operator guide","existing RunData guide was overwritten");
+        }
         string system=File.ReadAllText(Path.Combine(profile,"system_config.json"));
         string sequence=File.ReadAllText(Path.Combine(profile,"sequenceConfig.json"));
         if(kind=="fresh") {
@@ -108,6 +126,7 @@ def main():
         (assets / 'Templates/system_config.template.json').write_text('{"template":true}\n')
         (assets / 'system_config.json').write_text('{"bundledSystem":true}\n')
         (assets / 'sequenceConfig.json').write_text('{"bundledSequence":true}\n')
+        (assets / 'RunData_README.md').write_text('recording guide\n')
         (assets / 'ignored.meta').write_text('Unity import metadata\n')
         dll = temporary / f'bin/Debug/net{version}.0/Regression.dll'
         for kind in ('fresh', 'sequence-only', 'system-only', 'both', 'editor'):

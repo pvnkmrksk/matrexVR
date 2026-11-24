@@ -2,16 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 
-/// <summary>Seekable MATREX population frames. Fixed-width values preserve every sampled float.</summary>
+/// <summary>Lossless MATREX population frames with separately indexed, seekable blocks.</summary>
 public static class PopulationRecording
 {
     public const string Extension = ".matpop";
-    private const ulong HeaderMagic = 0x3130504f5054414d; // MATPOP01
-    private const ulong FooterMagic = 0x3130444e4554414d; // MATEND01
+    private const ulong LegacyHeaderMagic = 0x3130504f5054414d; // MATPOP01
+    private const ulong LegacyFooterMagic = 0x3130444e4554414d; // MATEND01
+    private const ulong HeaderMagic = 0x3230504f5054414d; // MATPOP02
+    private const ulong FooterMagic = 0x3230444e4554414d; // MATEND02
+    // V2 keeps the original frame bytes inside independent gzip blocks. The
+    // trailing directory sits between the identity table and the fixed footer.
     private const int FooterBytes = 48;
+    private const int IndexEntryBytes = sizeof(long) * 2 + sizeof(int) * 3;
+    private const int BlockHeaderBytes = sizeof(int) * 2;
+    private const int FramesPerBlock = 16;
+    private const int TargetBlockBytes = 256 * 1024;
+    private const int MaxBlockBytes = 64 * 1024 * 1024;
+    private const int MaxStoredBlockBytes = MaxBlockBytes + 1024 * 1024;
+    private const int FrameHeaderBytes = sizeof(int) * 3 + sizeof(long);
+    private const int MinFramePayloadBytes = 31;
+    private const int MinSampleBytes = 30;
 
     public static bool IsFile(string path) => path.EndsWith(Extension, StringComparison.OrdinalIgnoreCase);
 
@@ -42,6 +56,12 @@ public static class PopulationRecording
     public struct Totals
     {
         public long frames, rows, firstTicks, lastTicks;
+    }
+
+    private struct FrameIndexEntry
+    {
+        public long blockOffset, ticks;
+        public int offset, unityFrame, count;
     }
 
     private sealed class FrameWriter : BinaryWriter
@@ -106,11 +126,16 @@ public static class PopulationRecording
         private readonly HashingFile file;
         private readonly BinaryWriter output;
         private readonly BinaryWriter frame;
-        private readonly MemoryStream buffer = new MemoryStream(65536);
+        private readonly MemoryStream frameBuffer = new MemoryStream(65536);
+        private readonly MemoryStream block = new MemoryStream(65536);
+        private readonly MemoryStream encodedBlock = new MemoryStream(65536);
         private readonly AsyncSwarmWriter.RowLayout layout;
         private readonly Dictionary<(int index, string name, string layer), int> ids =
             new Dictionary<(int index, string name, string layer), int>();
         private readonly List<Identity> identities = new List<Identity>();
+        private readonly List<FrameIndexEntry> frameIndex = new List<FrameIndexEntry>();
+        private long blockOffset;
+        private int blockFrames;
         private Totals totals;
         public string Sha256 { get; private set; }
         public long BytesWritten => file.BytesWritten;
@@ -119,13 +144,15 @@ public static class PopulationRecording
         {
             file = new HashingFile(path);
             output = new BinaryWriter(new BufferedStream(file, 65536), Encoding.UTF8);
-            frame = new FrameWriter(buffer);
+            frame = new FrameWriter(frameBuffer);
             this.layout = layout;
             try
             {
                 output.Write(HeaderMagic);
                 output.Write((int)layout);
                 output.Write(header);
+                output.Flush();
+                blockOffset = file.BytesWritten;
             }
             catch
             {
@@ -136,7 +163,8 @@ public static class PopulationRecording
 
         public void Write(AsyncSwarmWriter.Frame value)
         {
-            buffer.Position = 0;
+            frameBuffer.Position = 0;
+            frame.Write(0); // Length prefix filled after writing the frame.
             long ticks = value.timestamp.Ticks;
             frame.Write(value.unityFrame);
             frame.Write(ticks);
@@ -189,9 +217,17 @@ public static class PopulationRecording
                     frame.Write(agent.visible);
                 }
             }
-            int size = checked((int)buffer.Position);
-            output.Write(size);
-            output.Write(buffer.GetBuffer(), 0, size);
+            int frameBytes = checked((int)frameBuffer.Position);
+            if (frameBytes > MaxBlockBytes) throw Invalid("A recorded population frame exceeds the block size limit.");
+            if (blockFrames == FramesPerBlock || blockFrames > 0 && block.Length + frameBytes > TargetBlockBytes)
+                WriteBlock();
+
+            frameBuffer.Position = 0;
+            frame.Write(frameBytes - sizeof(int));
+            frameIndex.Add(new FrameIndexEntry { blockOffset = blockOffset, offset = (int)block.Position,
+                unityFrame = value.unityFrame, count = value.count, ticks = ticks });
+            block.Write(frameBuffer.GetBuffer(), 0, frameBytes);
+            blockFrames++;
             totals.rows += value.count;
             if (totals.frames++ == 0) totals.firstTicks = totals.lastTicks = ticks;
             else
@@ -203,6 +239,7 @@ public static class PopulationRecording
 
         public void Finish()
         {
+            WriteBlock();
             output.Flush();
             long offset = file.BytesWritten;
             output.Write(identities.Count);
@@ -211,6 +248,14 @@ public static class PopulationRecording
                 output.Write(identity.index);
                 output.Write(identity.name);
                 output.Write(identity.layer);
+            }
+            foreach (var entry in frameIndex)
+            {
+                output.Write(entry.blockOffset);
+                output.Write(entry.offset);
+                output.Write(entry.unityFrame);
+                output.Write(entry.ticks);
+                output.Write(entry.count);
             }
             output.Write(FooterMagic);
             output.Write(offset);
@@ -222,11 +267,30 @@ public static class PopulationRecording
             Sha256 = file.FinishHash();
         }
 
+        private void WriteBlock()
+        {
+            if (blockFrames == 0) return;
+            int rawLength = (int)block.Length;
+            encodedBlock.SetLength(0);
+            using (var compressor = new GZipStream(encodedBlock, CompressionLevel.Fastest, true))
+                compressor.Write(block.GetBuffer(), 0, rawLength);
+
+            int storedLength = (int)encodedBlock.Length;
+            output.Write(rawLength);
+            output.Write(storedLength);
+            output.Write(encodedBlock.GetBuffer(), 0, storedLength);
+            blockOffset += BlockHeaderBytes + storedLength;
+            block.SetLength(0);
+            blockFrames = 0;
+        }
+
         public void Dispose()
         {
             output.Dispose();
             frame.Dispose();
-            buffer.Dispose();
+            frameBuffer.Dispose();
+            block.Dispose();
+            encodedBlock.Dispose();
         }
 
         private static bool DifferentBits(float a, float b) =>
@@ -236,7 +300,16 @@ public static class PopulationRecording
     public sealed class Reader : IDisposable
     {
         private readonly BinaryReader input;
-        private readonly long frameEnd;
+        private readonly bool packed;
+        private readonly long dataStart, frameEnd, indexStart;
+        private BinaryReader blockInput, sampleInput;
+        private long loadedBlock = -1;
+        private int loadedBlockLength;
+        private long sampleEnd, sampleNextOffset;
+        private byte[] encoded = Array.Empty<byte>();
+        private byte[] decoded = Array.Empty<byte>();
+
+        // A v1 cursor is a byte offset. A v2 cursor is a frame ordinal in the footer.
         public long FirstFrameOffset { get; }
         public AsyncSwarmWriter.RowLayout Layout { get; }
         public string Header { get; }
@@ -248,32 +321,39 @@ public static class PopulationRecording
             input = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 65536), Encoding.UTF8);
             try
             {
-                if (input.ReadUInt64() != HeaderMagic) throw Invalid("Invalid header.");
+                ulong magic = input.ReadUInt64();
+                if (magic != HeaderMagic && magic != LegacyHeaderMagic) throw Invalid("Invalid header.");
+                packed = magic == HeaderMagic;
                 int layout = input.ReadInt32();
                 if (layout < 0 || layout > (int)AsyncSwarmWriter.RowLayout.Band) throw Invalid("Unknown row layout.");
                 Layout = (AsyncSwarmWriter.RowLayout)layout;
                 Header = input.ReadString();
-                FirstFrameOffset = input.BaseStream.Position;
+                dataStart = input.BaseStream.Position;
+                FirstFrameOffset = packed ? 0 : dataStart;
                 long footerOffset = input.BaseStream.Length - FooterBytes;
-                if (footerOffset < FirstFrameOffset + sizeof(int)) throw Invalid("Missing footer.");
+                if (footerOffset < dataStart + sizeof(int)) throw Invalid("Missing footer.");
                 input.BaseStream.Position = footerOffset;
-                if (input.ReadUInt64() != FooterMagic) throw Invalid("Missing footer. The population stream may not have finished.");
+                if (input.ReadUInt64() != (packed ? FooterMagic : LegacyFooterMagic))
+                    throw Invalid("Missing footer. The population stream may not have finished.");
                 frameEnd = input.ReadInt64();
                 Summary = new Totals { frames = input.ReadInt64(), rows = input.ReadInt64(),
                     firstTicks = input.ReadInt64(), lastTicks = input.ReadInt64() };
-                if (frameEnd < FirstFrameOffset || frameEnd > footerOffset - sizeof(int) ||
+                if (frameEnd < dataStart || frameEnd > footerOffset - sizeof(int) ||
                     Summary.frames < 0 || Summary.rows < 0 || Summary.firstTicks < 0 ||
                     Summary.lastTicks < Summary.firstTicks || Summary.lastTicks > DateTime.MaxValue.Ticks)
                     throw Invalid("Invalid frame totals or identity table offset.");
+                if (packed && Summary.frames > (footerOffset - frameEnd - sizeof(int)) / IndexEntryBytes)
+                    throw Invalid("Invalid frame directory size.");
+                indexStart = packed ? footerOffset - Summary.frames * IndexEntryBytes : footerOffset;
                 if (!loadIdentities) return;
                 input.BaseStream.Position = frameEnd;
                 int count = input.ReadInt32();
-                if (count < 0 || count > (footerOffset - input.BaseStream.Position) / 6)
+                if (count < 0 || count > (indexStart - input.BaseStream.Position) / 6)
                     throw Invalid("Invalid identity count.");
                 Identities = new Identity[count];
                 for (int i = 0; i < count; i++)
                     Identities[i] = new Identity { index = input.ReadInt32(), name = input.ReadString(), layer = input.ReadString() };
-                if (input.BaseStream.Position != footerOffset) throw Invalid("Identity table size differs from footer.");
+                if (input.BaseStream.Position != indexStart) throw Invalid("Identity table size differs from footer.");
             }
             catch
             {
@@ -284,61 +364,155 @@ public static class PopulationRecording
 
         public bool ReadFrame(long offset, out Frame frame, bool readPayload = false)
         {
+            if (packed) return ReadIndexedFrame(offset, out frame, readPayload);
             frame = default;
             if (offset == frameEnd) return false;
-            if (offset < FirstFrameOffset || offset > frameEnd - 20) throw Invalid("Invalid frame offset.");
+            if (offset < dataStart || offset > frameEnd - FrameHeaderBytes) throw Invalid("Invalid frame offset.");
             input.BaseStream.Position = offset;
-            int size = input.ReadInt32();
-            frame.nextOffset = offset + sizeof(int) + size;
-            if (size < 31 || frame.nextOffset > frameEnd) throw Invalid("Invalid frame size.");
+            frame = ReadFrameRecord(input, frameEnd);
+            if (readPayload) ReadPayloadHeader(input, frame.nextOffset, ref frame);
+            return true;
+        }
+
+        private bool ReadIndexedFrame(long offset, out Frame frame, bool readPayload)
+        {
+            frame = default;
+            if (offset == Summary.frames) return false;
+            if (offset < 0 || offset > Summary.frames) throw Invalid("Invalid frame index.");
+
+            input.BaseStream.Position = indexStart + offset * IndexEntryBytes;
+            long blockOffset = input.ReadInt64();
+            int blockFrameOffset = input.ReadInt32();
             frame.unityFrame = input.ReadInt32();
             frame.ticks = input.ReadInt64();
             frame.count = input.ReadInt32();
-            if (frame.ticks < 0 || frame.ticks > DateTime.MaxValue.Ticks || frame.count < 0 ||
-                frame.count > (size - 31) / 30)
-                throw Invalid("Invalid population frame timestamp or row count.");
-            if (readPayload)
-            {
-                frame.skyboxId = input.ReadString();
-                frame.skyboxSampleUtc = input.ReadString();
-                frame.phase = input.ReadString();
-                if (Layout == AsyncSwarmWriter.RowLayout.Kannadi)
-                {
-                    frame.vrIndex = input.ReadInt32();
-                    frame.numberOfRings = input.ReadInt32();
-                    frame.hexRadius = input.ReadSingle();
-                }
-                frame.sx = input.ReadSingle(); frame.sy = input.ReadSingle(); frame.sz = input.ReadSingle();
-            }
+            frame.nextOffset = offset + 1;
+            if (blockOffset < dataStart || blockOffset > frameEnd - BlockHeaderBytes || blockFrameOffset < 0 ||
+                blockFrameOffset > MaxBlockBytes - FrameHeaderBytes ||
+                frame.ticks < 0 || frame.ticks > DateTime.MaxValue.Ticks || frame.count < 0 ||
+                frame.count > (MaxBlockBytes - MinFramePayloadBytes) / MinSampleBytes)
+                throw Invalid("Invalid frame directory entry.");
+            if (!readPayload) return true;
+
+            LoadBlock(blockOffset);
+            if (blockFrameOffset > loadedBlockLength - FrameHeaderBytes) throw Invalid("Invalid frame offset within block.");
+            blockInput.BaseStream.Position = blockFrameOffset;
+            Frame stored = ReadFrameRecord(blockInput, loadedBlockLength);
+            if (frame.unityFrame != stored.unityFrame || frame.ticks != stored.ticks || frame.count != stored.count)
+                throw Invalid("Frame payload does not match the directory.");
+            ReadPayloadHeader(blockInput, stored.nextOffset, ref frame);
             return true;
+        }
+
+        private void LoadBlock(long offset)
+        {
+            if (offset == loadedBlock) return;
+            loadedBlock = -1;
+            input.BaseStream.Position = offset;
+            int rawLength = input.ReadInt32();
+            int encodedLength = input.ReadInt32();
+            if (rawLength < sizeof(int) + MinFramePayloadBytes || rawLength > MaxBlockBytes ||
+                encodedLength <= 0 || encodedLength > MaxStoredBlockBytes ||
+                encodedLength > frameEnd - input.BaseStream.Position)
+                throw Invalid("Invalid population block lengths.");
+            if (encoded.Length < encodedLength) encoded = new byte[encodedLength];
+            if (decoded.Length < rawLength)
+            {
+                decoded = new byte[rawLength];
+                blockInput?.Dispose();
+                blockInput = new BinaryReader(new MemoryStream(decoded, false), Encoding.UTF8);
+            }
+            ReadExactly(input.BaseStream, encoded, encodedLength);
+            try
+            {
+                using (var buffer = new MemoryStream(encoded, 0, encodedLength, false))
+                using (var decompressor = new GZipStream(buffer, CompressionMode.Decompress))
+                {
+                    ReadExactly(decompressor, decoded, rawLength);
+                    if (decompressor.ReadByte() != -1) throw Invalid("Decoded block exceeds its recorded length.");
+                }
+            }
+            // Unity's Mono reports gzip checksum failures as IOException.
+            catch (IOException error) { throw new InvalidDataException("MATREX population stream: Invalid compressed block.", error); }
+            loadedBlockLength = rawLength;
+            loadedBlock = offset;
+        }
+
+        private static void ReadExactly(Stream stream, byte[] buffer, int length)
+        {
+            int position = 0;
+            while (position < length)
+            {
+                int count = stream.Read(buffer, position, length - position);
+                if (count == 0) throw Invalid("Truncated population block.");
+                position += count;
+            }
+        }
+
+        private static Frame ReadFrameRecord(BinaryReader source, long maxEnd)
+        {
+            int size = source.ReadInt32();
+            var frame = new Frame { nextOffset = source.BaseStream.Position + size };
+            if (size < MinFramePayloadBytes || frame.nextOffset > maxEnd) throw Invalid("Invalid frame size.");
+            frame.unityFrame = source.ReadInt32();
+            frame.ticks = source.ReadInt64();
+            frame.count = source.ReadInt32();
+            if (frame.ticks < 0 || frame.ticks > DateTime.MaxValue.Ticks || frame.count < 0 ||
+                frame.count > (size - MinFramePayloadBytes) / MinSampleBytes)
+                throw Invalid("Invalid population frame timestamp or row count.");
+            return frame;
+        }
+
+        private void ReadPayloadHeader(BinaryReader source, long end, ref Frame frame)
+        {
+            frame.skyboxId = source.ReadString();
+            frame.skyboxSampleUtc = source.ReadString();
+            frame.phase = source.ReadString();
+            if (Layout == AsyncSwarmWriter.RowLayout.Kannadi)
+            {
+                frame.vrIndex = source.ReadInt32();
+                frame.numberOfRings = source.ReadInt32();
+                frame.hexRadius = source.ReadSingle();
+            }
+            frame.sx = source.ReadSingle(); frame.sy = source.ReadSingle(); frame.sz = source.ReadSingle();
+            if (source.BaseStream.Position > end) throw Invalid("Population header exceeds its frame size.");
+            sampleInput = source;
+            sampleEnd = end;
+            sampleNextOffset = frame.nextOffset;
         }
 
         public Sample ReadSample(Frame frame)
         {
-            var result = new Sample { id = input.ReadInt32(), x = input.ReadSingle(), y = input.ReadSingle(), z = input.ReadSingle(),
-                rx = input.ReadSingle(), ry = input.ReadSingle(), rz = input.ReadSingle(), animation = ReadAnimation(input) };
-            bool customScale = input.ReadBoolean();
-            result.sx = customScale ? input.ReadSingle() : frame.sx;
-            result.sy = customScale ? input.ReadSingle() : frame.sy;
-            result.sz = customScale ? input.ReadSingle() : frame.sz;
+            var source = sampleInput;
+            var result = new Sample { id = source.ReadInt32(), x = source.ReadSingle(), y = source.ReadSingle(), z = source.ReadSingle(),
+                rx = source.ReadSingle(), ry = source.ReadSingle(), rz = source.ReadSingle(), animation = ReadAnimation(source) };
+            bool customScale = source.ReadBoolean();
+            result.sx = customScale ? source.ReadSingle() : frame.sx;
+            result.sy = customScale ? source.ReadSingle() : frame.sy;
+            result.sz = customScale ? source.ReadSingle() : frame.sz;
             result.visible = true;
             if (Layout == AsyncSwarmWriter.RowLayout.Band)
             {
-                result.speed = input.ReadSingle();
-                result.visibilityPhase = input.ReadSingle();
-                result.visible = input.ReadBoolean();
+                result.speed = source.ReadSingle();
+                result.visibilityPhase = source.ReadSingle();
+                result.visible = source.ReadBoolean();
             }
-            if (result.id < 0 || result.id >= Identities.Length || input.BaseStream.Position > frame.nextOffset)
+            if (result.id < 0 || result.id >= Identities.Length || source.BaseStream.Position > sampleEnd)
                 throw Invalid("Invalid population sample.");
             return result;
         }
 
         public void RequireFrameEnd(Frame frame)
         {
-            if (input.BaseStream.Position != frame.nextOffset) throw Invalid("Frame samples differ from the stored frame size.");
+            if (sampleInput == null || frame.nextOffset != sampleNextOffset || sampleInput.BaseStream.Position != sampleEnd)
+                throw Invalid("Frame samples differ from the stored frame size.");
         }
 
-        public void Dispose() => input.Dispose();
+        public void Dispose()
+        {
+            blockInput?.Dispose();
+            input.Dispose();
+        }
     }
 
     private static void WriteVector(BinaryWriter output, float x, float y, float z)
