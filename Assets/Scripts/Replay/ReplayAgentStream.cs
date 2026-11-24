@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 /// <summary>Indexes population frames on disk for seeking without keeping every agent sample in memory.</summary>
@@ -15,7 +16,6 @@ public sealed class ReplayAgentStream : IDisposable
         public Vector3 position, rotation, scale;
     }
     private struct Frame { public double time; public long offset; public int count, unityFrame; }
-    private readonly Dictionary<int,int> frameIndices = new Dictionary<int,int>();
     public bool HasUnityFrames { get; private set; }
     public bool HasScale { get; private set; }
     private struct Identity { public string name,layer; }
@@ -23,8 +23,11 @@ public sealed class ReplayAgentStream : IDisposable
     private readonly List<Identity> identities = new List<Identity>();
     private readonly List<Pose> current = new List<Pose>();
     private readonly string cachePath;
-    private readonly BinaryReader reader;
-    private readonly PopulationRecording.Reader packedReader;
+    private BinaryReader reader;
+    private PopulationRecording.Reader packedReader;
+    private readonly bool packed;
+    private readonly long sourceLength;
+    private readonly DateTime sourceWriteTime;
     private int lastFrame = int.MinValue;
     public string SourceFile { get; }
     public bool HasRotations { get; }
@@ -36,7 +39,7 @@ public sealed class ReplayAgentStream : IDisposable
     public int FrameCount => frames.Count;
     public bool HasDuplicateNames { get; private set; }
 
-    private ReplayAgentStream(string source,string cacheDirectory,long originTicks,string[] header,StreamReader input)
+    private ReplayAgentStream(string source,string cacheDirectory,long originTicks,string[] header,StreamReader input,CancellationToken cancellation)
     {
         SourceFile = source;
         HasRotations = Array.IndexOf(header,"RotationX") >= 0 && Array.IndexOf(header,"RotationY") >= 0 && Array.IndexOf(header,"RotationZ") >= 0;
@@ -69,6 +72,7 @@ public sealed class ReplayAgentStream : IDisposable
                 long ticks = 0;
                 while ((row=ReplaySessionArchive.ReadCsvRecord(input)) != null)
                 {
+                    if ((RowCount & 4095) == 0) cancellation.ThrowIfCancellationRequested();
                     if (string.IsNullOrWhiteSpace(row)) continue;
                     string[] values=ReplaySessionArchive.Csv(row);
                     string Cell(int index) => index >= 0 && index < values.Length ? values[index] : "";
@@ -120,62 +124,57 @@ public sealed class ReplayAgentStream : IDisposable
                 if(frame.count>0)frames.Add(frame);
             }
             frames.Sort((a,b)=>HasUnityFrames?a.unityFrame.CompareTo(b.unityFrame):a.time.CompareTo(b.time));
-            if(HasUnityFrames)for(int i=0;i<frames.Count;i++)frameIndices[frames[i].unityFrame]=i;
             // Small processed runs are cheap to retain in RAM. Large recordings
             // keep the indexed binary stream; source CSVs are always read-only.
             UsesMemoryCache = new FileInfo(cachePath).Length <= 64L * 1024 * 1024;
-            reader = UsesMemoryCache ? new BinaryReader(new MemoryStream(File.ReadAllBytes(cachePath), false)) :
-                new BinaryReader(new FileStream(cachePath,FileMode.Open,FileAccess.Read,FileShare.Read,65536));
         }
         catch {if(File.Exists(cachePath))File.Delete(cachePath);throw;}
     }
 
-    private ReplayAgentStream(string source, long originTicks)
+    private ReplayAgentStream(string source, long originTicks, CancellationToken cancellation)
     {
         SourceFile = source;
+        packed = true;
+        var sourceInfo = new FileInfo(source);
+        sourceLength = sourceInfo.Length;
+        sourceWriteTime = sourceInfo.LastWriteTimeUtc;
         HasRotations = HasAnimationState = HasUnityFrames = HasScale = true;
-        packedReader = new PopulationRecording.Reader(source);
-        Kind = packedReader.Layout.ToString();
-        HasVisibility = packedReader.Layout == AsyncSwarmWriter.RowLayout.Band;
-        try
+        using (var indexReader = new PopulationRecording.Reader(source, loadIdentities: false))
         {
-            long offset = packedReader.FirstFrameOffset;
-            while (packedReader.ReadFrame(offset, out var frame))
+            Kind = indexReader.Layout.ToString();
+            HasVisibility = indexReader.Layout == AsyncSwarmWriter.RowLayout.Band;
+            long offset = indexReader.FirstFrameOffset;
+            while (indexReader.ReadFrame(offset, out var frame))
             {
+                if ((frames.Count & 4095) == 0) cancellation.ThrowIfCancellationRequested();
                 if (frames.Count != 0 && frame.unityFrame <= frames[frames.Count - 1].unityFrame)
                     throw new InvalidDataException("Population frames are duplicated or out of order in " + source);
-                frameIndices.Add(frame.unityFrame, frames.Count);
                 frames.Add(new Frame { unityFrame = frame.unityFrame, offset = offset, count = frame.count,
                     time = (frame.ticks - originTicks) / (double)TimeSpan.TicksPerSecond });
                 RowCount += frame.count;
                 offset = frame.nextOffset;
             }
-            if (frames.Count != packedReader.Summary.frames || RowCount != packedReader.Summary.rows)
+            if (frames.Count != indexReader.Summary.frames || RowCount != indexReader.Summary.rows)
                 throw new InvalidDataException("Population frame or row totals differ from the stored footer in " + source);
-        }
-        catch
-        {
-            packedReader.Dispose();
-            throw;
         }
     }
 
-    public static ReplayAgentStream TryOpen(string source,string cacheDirectory,long originTicks)
+    public static ReplayAgentStream TryOpen(string source,string cacheDirectory,long originTicks,CancellationToken cancellation = default)
     {
-        if (PopulationRecording.IsFile(source)) return new ReplayAgentStream(source, originTicks);
+        if (PopulationRecording.IsFile(source)) return new ReplayAgentStream(source, originTicks, cancellation);
         using(var input=ReplaySessionArchive.OpenCsv(source))
         {
             string first=ReplaySessionArchive.ReadCsvRecord(input);if(first==null)return null;
             string[] header=ReplaySessionArchive.Csv(first.TrimStart('\ufeff'));
             if(!header.Contains("Timestamp") || !(header.Contains("Name") || header.Contains("CloneName")))return null;
-            return new ReplayAgentStream(source,cacheDirectory,originTicks,header,input);
+            return new ReplayAgentStream(source,cacheDirectory,originTicks,header,input,cancellation);
         }
     }
 
     public IReadOnlyList<Pose> Sample(double seconds)
     {
         int index=-1;
-        if(frames.Count>0 && seconds>=frames[0].time && seconds<=frames[frames.Count-1].time+.05)
+        if(CoversTime(seconds))
         {
             int lo=0,hi=frames.Count-1;
             while(lo<hi){int mid=(lo+hi+1)/2;if(frames[mid].time<=seconds)lo=mid;else hi=mid-1;}
@@ -183,15 +182,46 @@ public sealed class ReplayAgentStream : IDisposable
         }
         return ReadFrame(index);
     }
-    public IReadOnlyList<Pose> SampleUnityFrame(int frame) => ReadFrame(frameIndices.TryGetValue(frame,out var index)?index:-1);
+    public bool CoversTime(double seconds) => frames.Count > 0 && seconds >= frames[0].time && seconds <= frames[frames.Count - 1].time + .05;
+    public bool CoversUnityFrame(int frame) => frames.Count > 0 && frame >= frames[0].unityFrame && frame <= frames[frames.Count - 1].unityFrame;
+
+    public IReadOnlyList<Pose> SampleUnityFrame(int frame)
+    {
+        int lo = 0, hi = frames.Count - 1;
+        while (lo < hi)
+        {
+            int middle = (lo + hi) / 2;
+            if (frames[middle].unityFrame < frame) lo = middle + 1;
+            else hi = middle;
+        }
+        return ReadFrame(hi >= 0 && frames[lo].unityFrame == frame ? lo : -1);
+    }
+
+    public void ReleaseFrameReader()
+    {
+        packedReader?.Dispose();
+        packedReader = null;
+        reader?.Dispose();
+        reader = null;
+        lastFrame = int.MinValue;
+        current.Clear();
+    }
+
     private IReadOnlyList<Pose> ReadFrame(int index)
     {
         if(index==lastFrame)return current;
         lastFrame=index;current.Clear();
         if(index<0)return current;
         Frame frame=frames[index];
-        if (packedReader != null)
+        if (packed)
         {
+            if (packedReader == null)
+            {
+                var source = new FileInfo(SourceFile);
+                if (!source.Exists || source.Length != sourceLength || source.LastWriteTimeUtc != sourceWriteTime)
+                    throw new InvalidDataException("Population source changed after it was indexed: " + SourceFile);
+                packedReader = new PopulationRecording.Reader(SourceFile);
+            }
             if (!packedReader.ReadFrame(frame.offset, out var stored, true))
                 throw new InvalidDataException("Population frame is missing in " + SourceFile);
             for (int i = 0; i < stored.count; i++)
@@ -205,6 +235,9 @@ public sealed class ReplayAgentStream : IDisposable
             packedReader.RequireFrameEnd(stored);
             return current;
         }
+        if (reader == null)
+            reader = UsesMemoryCache ? new BinaryReader(new MemoryStream(File.ReadAllBytes(cachePath), false)) :
+                new BinaryReader(new FileStream(cachePath,FileMode.Open,FileAccess.Read,FileShare.Read,65536));
         reader.BaseStream.Position=frame.offset;
         for(int i=0;i<frame.count;i++)
         {
@@ -221,8 +254,7 @@ public sealed class ReplayAgentStream : IDisposable
 
     public void Dispose()
     {
-        packedReader?.Dispose();
-        reader?.Dispose();
+        ReleaseFrameReader();
         if(File.Exists(cachePath))File.Delete(cachePath);
     }
 }

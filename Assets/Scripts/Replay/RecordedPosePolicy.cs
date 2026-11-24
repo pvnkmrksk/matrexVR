@@ -34,10 +34,20 @@ public sealed class RecordedPosePolicy
         string Cell(int index)=>index>=0&&index<cells.Length?cells[index]:"";
         string scene=Cell(map.Scene);
         if(IsNonExperimentScene(scene,file))return RecordedPoseExclusion.SetupOrReplay;
-        if(steps==null||!map.Modern||ReplaySessionArchive.Integer(Cell(map.Frame),-1)<0)return RecordedPoseExclusion.None;
-        int step=ReplaySessionArchive.Integer(Cell(map.Step),-1);
-        if(step<0||step>=steps.Length||string.IsNullOrEmpty(steps[step]))return RecordedPoseExclusion.None;
-        string logical=Cell(map.Logical),phase=Cell(map.Phase);
+        if(steps==null||!map.Modern)return RecordedPoseExclusion.None;
+        return ClassifyHandoff(scene, Cell(map.Logical), Cell(map.Phase),
+            ReplaySessionArchive.Integer(Cell(map.Step),-1), ReplaySessionArchive.Integer(Cell(map.Frame),-1));
+    }
+
+    internal RecordedPoseExclusion Classify(string file, string scene, string logical, string phase, int step, int frame, bool modern)
+    {
+        if(IsNonExperimentScene(scene,file))return RecordedPoseExclusion.SetupOrReplay;
+        return steps==null||!modern ? RecordedPoseExclusion.None : ClassifyHandoff(scene, logical, phase, step, frame);
+    }
+
+    private RecordedPoseExclusion ClassifyHandoff(string scene, string logical, string phase, int step, int frame)
+    {
+        if(frame<0||step<0||step>=steps.Length||string.IsNullOrEmpty(steps[step]))return RecordedPoseExclusion.None;
         if(string.IsNullOrEmpty(phase)||logical!=steps[step]||!scenes.Contains(scene))return RecordedPoseExclusion.None;
         return scene!=logical||phase=="idle"?RecordedPoseExclusion.VerifiedIdleOrHandoff:RecordedPoseExclusion.None;
     }

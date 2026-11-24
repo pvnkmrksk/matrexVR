@@ -194,6 +194,29 @@ public static class PopulationSnapshotValidation
             packetWriter.WrittenRows == 75 && packetWriter.DroppedFrames == 0, "Stock packet writer preserves every row");
         Check(File.ReadAllBytes(packetPath).SequenceEqual(File.ReadAllBytes(serialPath)),
             "Stock and serial capture have identical packed bytes, including zero and negative scales and pooled buffer reuse");
+        using (var reader = new PopulationRecording.Reader(packetPath))
+        {
+            long cursor = reader.FirstFrameOffset;
+            var offsets = new List<long>();
+            while (reader.ReadFrame(cursor, out var metadata))
+            {
+                offsets.Add(cursor);
+                cursor = metadata.nextOffset;
+            }
+            Check(offsets.Count == 25 && reader.Summary.rows == 75, "The packed directory includes every frame and row");
+            foreach (int k in new[] { 24, 2, 16, 15, 0 })
+            {
+                Check(reader.ReadFrame(offsets[k], out var stored, true) && stored.unityFrame == 10 + k &&
+                    stored.count == scales.Length, "The packed directory seeks forward and backward across compressed blocks");
+                for (int i = 0; i < scales.Length; i++)
+                {
+                    var sample = reader.ReadSample(stored);
+                    Check(sample.y == k && sample.sx == scales[i].x && reader.Identities[sample.id].index == i + 2,
+                        "A seek preserves sampled coordinates, scales and identity");
+                }
+                reader.RequireFrameEnd(stored);
+            }
+        }
     }
     public static void Run()
     {

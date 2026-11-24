@@ -16,7 +16,8 @@ public static class RecordingSummary
     private static readonly string[] PoseColumns = { "GameObjectPosX", "GameObjectPosY", "GameObjectPosZ", "GameObjectRotX", "GameObjectRotY", "GameObjectRotZ" };
 
     public static JObject Scan(string directory, bool includeHashes = false, CancellationToken cancellation = default,
-        Action<string, string[], string[]> onPlayablePose = null, bool scanPopulationRows = false, JArray populationWriterEvidence = null)
+        Action<string, string[], string[]> onPlayablePose = null, bool scanPopulationRows = false,
+        JArray populationWriterEvidence = null, string replayPoseCacheRoot = null)
     {
         directory = Path.GetFullPath(directory);
         if (!Directory.Exists(directory)) throw new DirectoryNotFoundException(directory);
@@ -51,6 +52,8 @@ public static class RecordingSummary
             var fileRigs = new SortedSet<string>(StringComparer.Ordinal);
             bool scannedRows = true;
             string writerHash = null;
+            using var poseCache = includeHashes && archive != null && !string.IsNullOrEmpty(replayPoseCacheRoot) && !PopulationRecording.IsFile(file)
+                ? new PoseCacheCollector(archive, file, replayPoseCacheRoot, cancellation) : null;
             try
             {
                 if (PopulationRecording.IsFile(file))
@@ -89,6 +92,7 @@ public static class RecordingSummary
                         bool pose = time >= 0 && rig >= 0;
                         scannedRows = pose || scanPopulationRows;
                         info["role"] = pose ? "animal-pose" : Array.IndexOf(header, "Timestamp") >= 0 ? "agent-population" : "other-csv";
+                        if (pose) poseCache?.Begin(header);
                         if (!pose) time = Array.IndexOf(header, "Timestamp");
                         int[] positions = PoseColumns.Select(name => Array.IndexOf(header, name)).ToArray();
                         int metadataStart = Array.FindIndex(header, name => name.Contains(":"));
@@ -103,6 +107,7 @@ public static class RecordingSummary
                             catch (InvalidDataException) { fileRejected++; if (pose) rejected++; continue; }
                             if (cells.Length != expectedColumns)
                             { fileRejected++; if (pose) rejected++; continue; }
+                            poseCache?.Observe(cells);
                             if (pose)
                             {
                                 var excluded = policy.Classify(file, header, cells);
@@ -144,6 +149,8 @@ public static class RecordingSummary
             catch (Exception error) { info["readError"] = error.Message; warnings.Add(Path.GetFileName(file) + ": " + error.Message); }
             var after = new FileInfo(file);
             bool fileChanged = !after.Exists || after.Length != bytes || after.LastWriteTimeUtc.Ticks != writeTicks;
+            if (!fileChanged && fileRejected == 0 && info["readError"] == null)
+                poseCache?.Complete((string)info["sha256"]);
             changed |= fileChanged;
             info["changedDuringScan"] = fileChanged;
             info["rowsInspected"] = scannedRows;
@@ -170,8 +177,71 @@ public static class RecordingSummary
                 ["sequenceCycleCount"] = cyclesComplete && playable > 0 ? (JToken)new JValue(cycles.Count) : JValue.CreateNull(),
                 ["sequenceStepIndices"] = new JArray(steps), ["contextCount"] = contexts.Count, ["presentationsByRig"] = counts,
                 ["presentationCountBasis"] = "unique phase-independent recorded scene/cycle/step/config/internal-step contexts per rig; missing legacy counters can merge occurrences" },
-            ["metadata"] = Metadata(directory, archive, warnings), ["files"] = files, ["warnings"] = new JArray(warnings.Distinct())
+            ["metadata"] = ReadMetadata(directory, archive?.Sequence, archive?.SystemConfiguration, warnings), ["files"] = files, ["warnings"] = new JArray(warnings.Distinct())
         };
+    }
+
+    /// <summary>Feeds an optional local replay index from the CSV rows already being inspected for the seal.</summary>
+    private sealed class PoseCacheCollector : IDisposable
+    {
+        private readonly ReplaySessionArchive archive;
+        private readonly string file, cacheRoot;
+        private readonly CancellationToken cancellation;
+        private ReplaySessionArchive.PoseProjection projection;
+        private ReplayPoseCache.PendingWrite pending;
+        private bool hasRows;
+
+        public PoseCacheCollector(ReplaySessionArchive archive, string file, string cacheRoot, CancellationToken cancellation)
+        {
+            this.archive = archive;
+            this.file = file;
+            this.cacheRoot = cacheRoot;
+            this.cancellation = cancellation;
+        }
+
+        public void Begin(string[] header)
+        {
+            try
+            {
+                projection = archive.CreatePoseProjection(file, header);
+                if (projection.HasPoseColumns) pending = archive.BeginPoseCacheWrite(file, cacheRoot);
+            }
+            catch (Exception error) when (!(error is OperationCanceledException && cancellation.IsCancellationRequested))
+            { Dispose(); }
+        }
+
+        public void Observe(string[] cells)
+        {
+            if (pending == null) return;
+            try
+            {
+                var sample = projection.ProjectCells(cells);
+                if (sample == null) return;
+                pending.Add(sample, cancellation);
+                hasRows = true;
+            }
+            catch (Exception error) when (!(error is OperationCanceledException && cancellation.IsCancellationRequested))
+            { Dispose(); }
+        }
+
+        public void Complete(string sealedHash)
+        {
+            if (pending == null || !hasRows || string.IsNullOrEmpty(sealedHash)) return;
+            cancellation.ThrowIfCancellationRequested();
+            try { pending.Complete(sealedHash, projection.FinishWarnings()); }
+            catch (Exception error) when (!(error is OperationCanceledException && cancellation.IsCancellationRequested))
+            { Dispose(); }
+        }
+
+        public void Dispose()
+        {
+            var write = pending;
+            pending = null;
+            projection = null;
+            // The archive seal remains authoritative even if a local cache stream fails to close.
+            try { write?.Dispose(); }
+            catch (Exception error) when (ReplayPoseCache.OptionalFailure(error) || error is ObjectDisposedException) { }
+        }
     }
 
     private static string ValidatePopulationReceipt(JObject receipt, long bytes, long writeTicks, PopulationRecording.Totals totals)
@@ -239,7 +309,7 @@ public static class RecordingSummary
         return result;
     }
 
-    private static JObject Metadata(string directory, ReplaySessionArchive archive, List<string> warnings)
+    internal static JObject ReadMetadata(string directory, JObject sequence, JObject system, List<string> warnings)
     {
         JObject data = null;
         foreach (string name in new[] { "AnimalMetadata.json", "FlyMetaData.json" })
@@ -258,7 +328,7 @@ public static class RecordingSummary
         var normalized = new JArray(animals.OfType<JObject>().Select(animal => new JObject {
             ["VR"] = animal["VR"]?.DeepClone(), ["AnimalID"] = (animal.Property("AnimalID") != null ? animal["AnimalID"] : animal["FlyID"])?.DeepClone(),
             ["SpeciesName"] = animal["SpeciesName"]?.DeepClone() }));
-        var rigs = archive?.SystemConfiguration?["configs"] as JArray ?? new JArray();
+        var rigs = system?["configs"] as JArray ?? new JArray();
         foreach (var rig in rigs.OfType<JObject>())
         {
             string id = (string)rig["vrId"];
@@ -268,9 +338,9 @@ public static class RecordingSummary
             if (string.IsNullOrWhiteSpace((string)animal["SpeciesName"])) animal["SpeciesName"] = rig["speciesName"]?.DeepClone();
         }
         var ids = normalized.OfType<JObject>().Select(animal => (string)animal["AnimalID"]).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().OrderBy(id => id, StringComparer.Ordinal);
-        var planned = archive?.Sequence?["sequences"] as JArray ?? new JArray();
+        var planned = sequence?["sequences"] as JArray ?? new JArray();
         return new JObject { ["experimentName"] = data?["ExperimentName"]?.DeepClone(), ["experimenterName"] = data?["ExperimenterName"]?.DeepClone(),
-            ["sequenceConfigTitle"] = archive?.Sequence?["title"]?.DeepClone(),
+            ["sequenceConfigTitle"] = sequence?["title"]?.DeepClone(),
             ["sequenceTitles"] = new JArray(planned.OfType<JObject>().Select(step => (string)step["title"]).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct()),
             ["configuredAnimals"] = normalized, ["identifiedAnimalIds"] = new JArray(ids),
             ["backends"] = new JArray(rigs.OfType<JObject>().Select(rig => (string)rig["closedLoopMode"]).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct()),

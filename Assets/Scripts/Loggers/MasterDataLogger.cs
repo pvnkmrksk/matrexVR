@@ -121,6 +121,7 @@ public class MasterDataLogger : MonoBehaviour
 
     private void BeginRecordingEvidence()
     {
+        RuntimePaths.CopyRunDataReadme(directoryPath);
         sealedCloseErrors = null;
         SaveSwarmData = true;
         var player = PlayerBuildIdentity.Capture();
@@ -209,7 +210,7 @@ public class MasterDataLogger : MonoBehaviour
         return session.FinalizeAsync(endReason,
             token => { AsyncSwarmWriter.DrainAll(); return Task.CompletedTask; },
             async token => (await media.FinalizeAsync(token).ConfigureAwait(false)).ToJson(),
-            () => WriterEvidence(directory), media.ObservePose, errors.ToArray());
+            () => WriterEvidence(directory), media.ObservePose, errors.ToArray(), ReplayPoseCache.DefaultRoot);
     }
 
     public void SealSessionForFinalization()

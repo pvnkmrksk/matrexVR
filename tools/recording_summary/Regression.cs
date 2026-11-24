@@ -8,15 +8,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace UnityEngine
-{
-    public static class Application
-    {
-        public static bool isEditor=false;
-        public static string version="0.3.1-dev", unityVersion="fixture-unity", buildGUID="actual-player-guid", streamingAssetsPath;
-    }
-}
-
 static class Regression
 {
     static int checks;

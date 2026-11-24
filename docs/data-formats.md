@@ -1,5 +1,7 @@
 # Recorded data and units
 
+The [run folder guide](../Assets/StreamingAssets/RunData_README.md) identifies the files, manifests, clocks, and optional media that accompany recorded data. New sessions include a copy in their folder.
+
 Recorded swarm **input** uses `ID,X,Y,Z,time` with Unity axes (+X east, +Y up, +Z north), metres, and relative seconds. See [swarm-playback.md](swarm-playback.md). Presented/logged positions use the scene's world units: metres on terrain/migration, centimetres in walking scenes. The input CSV scale and physical moth scale are configured independently.
 
 MasterDataLogger creates `Assets/RunData/yyyyMMdd_HHmmss/` in the Editor (current standalone source uses `RuntimePaths.RunDataRoot`, default `<player directory>/MATREX VR RunData` beside the app or executable; a protected installation uses `Application.persistentDataPath/Installations/<installation-id>/RunData`. `--data-dir` overrides either location. Earlier standalone builds used the shared `Application.persistentDataPath/RunData`; 0.1/0.2 retain `Application.dataPath/RunData`). A numeric suffix is added if that timestamp already has a folder or ZIP. It snapshots the system, sequence and referenced experiment files before the sequence starts, and retains exact versions consumed on later loads. Stop seals the run directory. [Package the run](manual/recording-pipeline.md#stop-and-package-a-run) separately when acquisition is idle. Keep the original bundle alongside exported data to retain gains, stimulus conditions, camera layout and physical scale. See [run configuration snapshots](run-config-snapshots.md) for the layout, manifest and historical audit.
@@ -14,7 +16,7 @@ Use Python 3.8 or newer to export a finalized population file as CSV. The export
 python3 tools/unpack_population.py path/to/session/agents.matpop exports/agents.csv
 ```
 
-Use an output directory outside the saved session so replay's acquisition inventory stays intact. The default output is standard output. Use `--legacy-header` to append historical `Key:Value` fields to the header. The default CSV is rectangular and retains the original column order, including frame identity, scale and JSON animation state. Empty population frames have no CSV rows and remain available in the `.matpop` file. Recording directories store the packed streams without compression to keep compression off the acquisition path. These files can occupy more disk space than the old gzip logs. Optional offline ZIP packaging can compress them after the run.
+Use an output directory outside the saved session so replay's acquisition inventory stays intact. The default output is standard output. Use `--legacy-header` to append historical `Key:Value` fields to the header. The default CSV is rectangular and retains the original column order, including frame identity, scale and JSON animation state. Empty population frames have no CSV rows and remain available in the `.matpop` file. `MATPOP01` stores uncompressed frames. The current `MATPOP02` writer losslessly gzip-compresses bounded frame blocks on its worker and writes a frame directory for seeking. The CSV exporter reads both formats. Animal CSVs remain the original acquisition record. Replay can build a local `.matpose` projection from those CSVs outside the acquisition directory.
 
 ## Offline population Parquet
 
@@ -34,7 +36,7 @@ DataLogger emits a header and comma-separated rows. The rig's transform is the w
 
 | Column | Meaning / units |
 |---|---|
-| `Current Time` | Local `yyyy-MM-dd HH:mm:ss.fff`. |
+| `Current Time` | Local wall-clock time, with up to seven fractional digits. |
 | `VR` | Rig object name. |
 | `Scene` | Actual loaded Unity scene. |
 | `CurrentSequenceScene` | Configured outer sequence scene. |
@@ -74,7 +76,7 @@ post = rows[rows["experimentPhase"] == "postStimulus"]
 
 The value uses the same state source as live telemetry's `system.phase`. It describes the state at the logger's sampling callback; phase transitions occur in LateUpdate. Historical CSVs collected before this column was added remain unchanged.
 
-Sensor columns are present only when includeZmqData is enabled on the logger. A stale packet holds the last pose, and the CSV does not currently include a freshness/validity column. A stationary logged pose alone cannot distinguish stationary behavior from packet loss; use runtime_trace.log and the original tracker stream.
+Sensor columns are present when `includeZmqData` is enabled on the logger. A stale packet can hold the last pose. In current CSVs, use `trackerAppliedThisFrame`, `trackerInput*` and `trackerReceiveSequence` to inspect input timing. For older CSVs, review `runtime_trace.log` and the saved tracker stream when available.
 
 ### ZMQ input contract
 
@@ -128,9 +130,9 @@ This captures the native configuration file on disk when the Unity run starts. I
 
 ## Analysis and replay cautions
 
-Unwrap yaw before angular-velocity calculations. Use wall-clock differences for elapsed time while checking duplicates/jumps; a future monotonic timestamp would be preferable for sub-millisecond synchronization. Periodic X/Z wrapping and R resets cause coordinate discontinuities: use arena size and experiment boundaries when reconstructing path lengths. The fading overview trail is an operator display, not an analysis record.
+Unwrap yaw before angular-velocity calculations. Use `monotonicTime` for elapsed time within a supported run and `unityFrame` for frame joins. For older CSVs with local wall time, check for duplicates or clock jumps before computing elapsed time. Periodic X/Z wrapping and R resets cause coordinate discontinuities: use arena size and experiment boundaries when reconstructing path lengths. The fading overview trail is an operator display, not an analysis record.
 
-Current source writes rig numbers with invariant culture and round-trip float precision, quotes strings with CSV delimiters, and supports quoted multiline fields on replay. This prevents decimal-comma Mac locales or comma-containing step/config names from shifting pose columns. Rig timestamps retain seven fractional digits; `unityFrame` identifies the rendered frame. Regular rig capture runs in LateUpdate at order 1200, after movement/terrain adjustment and before telemetry. Immediate onset/swap event rows remain additional evidence.
+Current source writes rig numbers with invariant culture and round-trip float precision, quotes strings with CSV delimiters, and supports quoted multiline fields on replay. This prevents decimal-comma Mac locales or comma-containing step/config names from shifting pose columns. Rig timestamps retain seven fractional digits; `unityFrame` identifies the rendered frame. Regular rig capture runs in LateUpdate at order 1200, after movement/terrain adjustment and before telemetry. Current onset and swap metadata is attached to the relevant final pose snapshot.
 
 Archived versions used machine numeric culture and unquoted strings. A legacy row with a different field count is now rejected with an explicit warning rather than silently interpreting shifted numbers as a pose. Such corrupted rows cannot be recovered unambiguously. Kannadi/Swarm numeric writers already used invariant culture. Population gzip logs are loaded separately from animal trajectories.
 

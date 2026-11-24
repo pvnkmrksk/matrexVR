@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -24,7 +25,11 @@ public sealed class ReplaySessionArchive
         public string blackSideAtTrialStart;
         internal bool swapEvent;
         public string StimulusKey => ContextKey + "|swap:" + colorsSwapped + "|gray:" + grayAtTrialStart?.ToString(CultureInfo.InvariantCulture) + "|black:" + blackSideAtTrialStart;
-        public string ContextKey => presentationId + "|" + scene + "|" + sequenceStep + "|" + trial + "|" + loopIndex + "|" + cumulativeStep + "|" + configFile + "|" + stepName + "|" + phase;
+        internal string savedContextKey;
+        public string ContextKey => savedContextKey ?? (presentationId + "|" + scene + "|" + sequenceStep + "|" + trial + "|" + loopIndex + "|" + cumulativeStep + "|" + configFile + "|" + stepName + "|" + phase);
+        internal bool MatchesContext(Sample other) => presentationId == other.presentationId && scene == other.scene &&
+            sequenceStep == other.sequenceStep && trial == other.trial && loopIndex == other.loopIndex && cumulativeStep == other.cumulativeStep &&
+            configFile == other.configFile && stepName == other.stepName && phase == other.phase;
     }
 
     public string DirectoryPath { get; }
@@ -33,10 +38,17 @@ public sealed class ReplaySessionArchive
     public long OriginTicks { get; private set; }
     public double Duration { get; private set; }
     public double FirstExperimentTime { get; private set; }
+    public int PoseCacheHits { get; private set; }
     public JObject Sequence { get; private set; }
     public JObject SystemConfiguration { get; private set; }
     public RecordedPosePolicy PosePolicy { get; }
     public ReplayPresentationJournal Presentations { get; }
+    public bool AllowsPartialPlayback { get; private set; }
+    public bool HasInterruptedSeal { get; private set; }
+    internal bool PlaybackPrepared { get; private set; }
+    private HashSet<string> playbackFiles;
+    private readonly Dictionary<string,(long ticks,string sha)> sealedPoseSources = new Dictionary<string,(long,string)>(StringComparer.Ordinal);
+    private string poseCacheContext;
     private readonly JObject manifest;
     private readonly Dictionary<string,(long bytes,long ticks)> verifiedRecordingFiles = new Dictionary<string,(long,long)>(StringComparer.Ordinal);
     private readonly HashSet<string> verified = new HashSet<string>(StringComparer.Ordinal);
@@ -108,89 +120,556 @@ public sealed class ReplaySessionArchive
             throw new InvalidDataException("Acquisition file inventory differs from the finalized recording.");
     }
 
-    public void LoadRigSamples()
+    // Interactive playback uses the archived schema, source sizes and readable
+    // evidence. RequireCompatibleBuild remains the full, eager seal audit.
+    public void PrepareForPlayback()
     {
-        Rigs.Clear(); OriginTicks = long.MaxValue; Duration = 0;
-        foreach (string file in CsvFiles(DirectoryPath))
+        if (PlaybackPrepared) return;
+        if (!Presentations.IsCurrentContract) { PlaybackPrepared = true; return; }
+        var current = PlayerBuildIdentity.Capture();
+        try { Presentations.ValidateBuild(current); }
+        catch (InvalidDataException) when (IsSupportedAcquisition(Presentations.Contract["player"] as JObject, current))
         {
-            using (var reader = OpenCsv(file))
+            Warn("Replaying archived evidence from MATREX " + (string)Presentations.Contract["player"]["applicationVersion"] + ".");
+        }
+
+        string path = Path.Combine(DirectoryPath, "recording_manifest.json");
+        var evidence = File.Exists(path) ? ReplayPresentationJournal.Parse(File.ReadAllText(path)) : null;
+        HasInterruptedSeal = (string)evidence?["lifecycle"]?["status"] != "finalized" ||
+            (bool?)evidence?["lifecycle"]?["writersDrained"] != true;
+        if (HasInterruptedSeal) MarkPartial("Acquisition did not finish sealing. Replay uses frames that were saved before recording stopped.");
+
+        var errors = new FileInfo(Path.Combine(DirectoryPath, "replay_evidence_errors.jsonl"));
+        if (errors.Exists && errors.Length > 0) MarkPartial("Acquisition reported an evidence error. Review replay_evidence_errors.jsonl for details.");
+        if (evidence?["writerEvidence"] is JArray writers && writers.Any(writer =>
+            (long?)writer["droppedFrames"] > 0 || !string.IsNullOrEmpty((string)writer["failure"])))
+            MarkPartial("The recorder reported dropped population frames or a writer failure.");
+
+        if (HasInterruptedSeal || !(evidence?["files"] is JArray files)) { PlaybackPrepared = true; return; }
+        playbackFiles = new HashSet<string>(StringComparer.Ordinal);
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        int missingPopulation = 0, missingPose = 0, changed = 0;
+        foreach (var item in files.OfType<JObject>())
+        {
+            string relative = (string)item["relativePath"];
+            if (string.IsNullOrWhiteSpace(relative) || Path.GetFileName(relative) != relative || !names.Add(relative))
+                throw new InvalidDataException("Invalid or duplicate acquisition inventory path.");
+            string role = (string)item["role"];
+            if (role != "agent-population" && role != "animal-pose" && role != null) continue;
+            var file = new FileInfo(Path.Combine(DirectoryPath, relative));
+            if (!file.Exists)
             {
-                string first = ReadCsvRecord(reader);
-                if (first == null) continue;
-                var header = Csv(first.TrimStart('\ufeff'));
-                int time = Array.IndexOf(header, "Current Time"), rig = Array.IndexOf(header, "VR");
-                if (time < 0 || rig < 0) continue; // Agent and audit logs have a different schema.
-                int[] pose = { Array.IndexOf(header,"GameObjectPosX"), Array.IndexOf(header,"GameObjectPosY"), Array.IndexOf(header,"GameObjectPosZ"),
-                    Array.IndexOf(header,"GameObjectRotX"), Array.IndexOf(header,"GameObjectRotY"), Array.IndexOf(header,"GameObjectRotZ") };
-                if (pose.Any(i => i < 0)) { Warnings.Add("Missing pose columns: " + Path.GetFileName(file)); continue; }
-                int max = Math.Max(Math.Max(time, rig), pose.Max()), rejected = 0, misaligned = 0, nonExperiment = 0, handoff = 0;
-                string line;
-                while ((line = ReadCsvRecord(reader)) != null)
+                if (role == "agent-population" || PopulationRecording.IsFile(relative)) missingPopulation++;
+                else missingPose++;
+                continue;
+            }
+            if (file.Length != (long?)item["bytes"] || (bool?)item["changedDuringScan"] == true ||
+                (long?)item["rejectedRows"] > 0 || !string.IsNullOrEmpty((string)item["readError"]))
+            {
+                changed++;
+                continue;
+            }
+            playbackFiles.Add(file.FullName);
+            if (role == "animal-pose" && (long?)item["lastWriteUtcTicks"] is long ticks && (string)item["sha256"] is string hash)
+                sealedPoseSources[file.FullName] = (ticks, hash);
+        }
+        if (missingPopulation > 0) MarkPartial(missingPopulation + " population tracks are missing from this copy. Their agents are shown only where recorded tracks are available.");
+        if (missingPose > 0) MarkPartial(missingPose + " recorded animal pose files are missing.");
+        if (changed > 0) MarkPartial(changed + " changed or unreadable files were skipped.");
+        PlaybackPrepared = true;
+    }
+
+    private static bool IsSupportedAcquisition(JObject recorded, JObject current)
+    {
+        if (recorded == null || recorded["editorRuntimeIdentity"] != null ||
+            (string)recorded["unityVersion"] != (string)current?["unityVersion"]) return false;
+        string guid = (string)recorded["buildGuid"];
+        string fingerprint = (string)recorded["runtimeSourceFingerprintSha256"];
+        return (guid == "f88e1383fd30465a970a27483fee7095" && fingerprint == "a985081f75f30088b3ee576f69df365e2744019172999f3977ae8e79025f165f") ||
+            (guid == "d26a9e88f2f64eccafbea41ff24a384f" && fingerprint == "11f67e0797d618e37f3c86bb0008969415d979b64a5482af882a3749ed143d9e") ||
+            (guid == "9168de619d794e8f9f6d82526b78a4b5" && fingerprint == "8971ffcaf1ef5e121b6af8f9c08821971df09ec1c586b28d060691df4e62d807") ||
+            (guid == "a5adef84c4674343aa1ed62a93798d91" && fingerprint == "4f67c971d0c64b2fd1d1c2d2e228ffaf2a9132fdcd4be91a74b1ff7064ee430e") ||
+            (guid == "6f33a9594f9a4056ab3222758103a4b9" && fingerprint == "52e34a9a556db0ae6a03f797ac8018d8d1dd0c0855c9c35c7b4c5ad79965e283") ||
+            (guid == "c9a5757d7a2144b097123c38875022fd" && fingerprint == "9f455f36c09b0beb6e703ec5ac80013617d0d021278349401b6e99892eb714e0") ||
+            (guid == "eef52b99631e44889aa849d5234604a2" && fingerprint == "22a16519d498bfb7acc8fd884b9be454fca7f7665a94f96d2d6254d869963d8c");
+    }
+
+    private bool UsePlaybackFile(string path) => playbackFiles == null || playbackFiles.Contains(path);
+
+    public IEnumerable<string> PopulationFiles() => RecordedFiles(DirectoryPath)
+        .Where(path => UsePlaybackFile(path) && !poseFiles.Contains(path));
+
+    private readonly HashSet<string> poseFiles = new HashSet<string>(StringComparer.Ordinal);
+
+    internal void MarkPartial(string warning)
+    {
+        AllowsPartialPlayback = true;
+        Warn(warning);
+    }
+
+    internal void TrimAfterWorldFrame(int lastFrame)
+    {
+        bool trimmed = false;
+        foreach (string rig in Rigs.Keys.ToArray())
+        {
+            var samples = Rigs[rig];
+            int count = samples.Count;
+            while (count > 0 && samples[count - 1].unityFrame > lastFrame) count--;
+            if (count == samples.Count) continue;
+            trimmed = true;
+            if (count == 0) Rigs.Remove(rig);
+            else samples.RemoveRange(count, samples.Count - count);
+        }
+        if (Rigs.Count == 0) throw new InvalidDataException("No recorded animal pose overlaps the saved world frames.");
+        if (!trimmed) return;
+        Duration = Rigs.Values.Max(rig => rig[rig.Count - 1].time);
+        FirstExperimentTime = Math.Min(FirstExperimentTime, Duration);
+        MarkPartial("The replay ends at the last complete world frame. Later animal samples remain in the original logs.");
+    }
+
+    private string PoseCacheContext()
+    {
+        if (poseCacheContext != null) return poseCacheContext;
+        string presentations = Path.Combine(DirectoryPath, ReplayPresentationJournal.FileName);
+        string journalHash = "";
+        if (Presentations.IsCurrentContract)
+        {
+            using var input = File.OpenRead(presentations);
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            journalHash = Convert.ToBase64String(sha.ComputeHash(input));
+        }
+        string sequence = Sequence?.ToString(Newtonsoft.Json.Formatting.None) ?? "";
+        return poseCacheContext = RunConfigArchive.Hash(Encoding.UTF8.GetBytes((manifest != null ? "sealed" : "legacy") +
+            "\n" + journalHash + "\n" + sequence));
+    }
+
+    internal ReplayPoseCache.PendingWrite BeginPoseCacheWrite(string path, string cacheRoot)
+    {
+        cacheRoot = ReplayPoseCache.OutsideRecording(cacheRoot, DirectoryPath);
+        return cacheRoot == null ? null : new ReplayPoseCache.PendingWrite(cacheRoot, new FileInfo(path), PoseCacheContext());
+    }
+
+    public void LoadRigSamples() => LoadRigSamples(CancellationToken.None);
+
+    public void LoadRigSamples(CancellationToken cancellation, string cacheRoot = null, Action<long,long> reportProgress = null)
+    {
+        Rigs.Clear(); poseFiles.Clear(); OriginTicks = long.MaxValue; Duration = FirstExperimentTime = 0;
+        PoseCacheHits = 0;
+        cacheRoot = ReplayPoseCache.OutsideRecording(cacheRoot, DirectoryPath);
+        var files = CsvFiles(DirectoryPath).Where(UsePlaybackFile).Select(path => new FileInfo(path)).ToArray();
+        long totalBytes = files.Sum(file => file.Length), completedBytes = 0;
+        reportProgress?.Invoke(0, totalBytes);
+        foreach (var source in files)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            string file = source.FullName;
+            long fileBytes = source.Length, fileTicks = source.LastWriteTimeUtc.Ticks;
+            long reportedFileBytes = 0;
+            void ReportFile(long position)
+            {
+                position = Math.Min(fileBytes, position);
+                if (position <= reportedFileBytes) return;
+                reportedFileBytes = position;
+                reportProgress?.Invoke(completedBytes + position, totalBytes);
+            }
+            string hash = sealedPoseSources.TryGetValue(file, out var sealedFile) && sealedFile.ticks == fileTicks ? sealedFile.sha : null;
+            PoseFile result = null;
+            if (cacheRoot != null)
+            {
+                try
                 {
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    string[] cells;
-                    try { cells = Csv(line); } catch (InvalidDataException) { rejected++; continue; }
-                    if (cells.Length != header.Length) { rejected++; misaligned++; continue; }
-                    var exclusion=PosePolicy.Classify(file,header,cells);
-                    if(exclusion==RecordedPoseExclusion.SetupOrReplay){nonExperiment++;continue;}
-                    if(exclusion==RecordedPoseExclusion.VerifiedIdleOrHandoff){handoff++;continue;}
-                    if (cells.Length <= max || string.IsNullOrWhiteSpace(cells[rig]) || !TryTimestamp(cells[time], out long ticks)) { rejected++; continue; }
-                    float[] values = new float[6]; bool valid = true;
-                    for (int i = 0; i < pose.Length; i++) valid &= TryNumber(cells[pose[i]], out values[i]);
-                    if (!valid) { rejected++; continue; }
-                    if(Presentations.IsCurrentContract && !System.Text.RegularExpressions.Regex.IsMatch(CanonicalRig(cells[rig]),"^VR([1-9]|1[0-6])$"))continue;
-                    var sample = new Sample { timestampTicks = ticks, rig = CanonicalRig(cells[rig]),recordedRigName=cells[rig],
-                        position = new Vector3(values[0], values[1], values[2]), rotation = new Vector3(values[3], values[4], values[5]),
-                        scene = Cell(header,cells,"Scene"), configFile = Cell(header,cells,"ConfigFile"), stepName = Cell(header,cells,"stepName"),
-                        phase = Cell(header,cells,"experimentPhase"), skyboxId = Cell(header,cells,"skyboxId"),
-                        presentationId = Cell(header,cells,"presentationId"),
-                        unityFrame = Integer(Cell(header,cells,"unityFrame"),-1),
-                        monotonicTime=double.TryParse(Cell(header,cells,"monotonicTime"),NumberStyles.Float,CultureInfo.InvariantCulture,out double monotonic)?monotonic:double.NaN,
-                        swapEvent = TryNumber(Cell(header,cells,"swapElapsedSec"), out _),
-                        grayAtTrialStart = TryNumber(Cell(header,cells,"grayAtTrialStart"), out float gray) ? gray : (float?)null,
-                        blackSideAtTrialStart = Cell(header,cells,"blackSideAtTrialStart"),
-                        sequenceStep = Integer(Cell(header,cells,"CurrentStep"),-1), stepIndex = Integer(Cell(header,cells,"stepIndex"),-1),
-                        trial = Integer(Cell(header,cells,"CurrentTrial"),0),loopIndex=Integer(Cell(header,cells,"loopIndex")),cumulativeStep=Integer(Cell(header,cells,"cumulativeStep")) };
-                    if(!Presentations.IsCurrentContract && !string.IsNullOrEmpty(sample.presentationId))
-                        throw new InvalidDataException("Frame references a presentation but its same-build contract is missing.");
-                    if(Presentations.IsCurrentContract)
+                    string key = ReplayPoseCache.Key(source, PoseCacheContext(), hash);
+                    if (ReplayPoseCache.TryRead(cacheRoot, key, cancellation, (loaded, size) =>
+                        ReportFile(size > 0 ? (long)(fileBytes * ((double)loaded / size)) : 0),
+                        out var rigs, out var warnings))
                     {
-                        if(sample.unityFrame<0||double.IsNaN(sample.monotonicTime)||double.IsInfinity(sample.monotonicTime))throw new InvalidDataException("Same-build pose frame has no monotonic rendered-frame clock.");
-                        Presentations.RequireEntry(sample.presentationId);
+                        source.Refresh();
+                        if (source.Exists && source.Length == fileBytes && source.LastWriteTimeUtc.Ticks == fileTicks)
+                        {
+                            result = new PoseFile(rigs, warnings);
+                            PoseCacheHits++;
+                        }
                     }
-                    if (!Rigs.TryGetValue(sample.rig, out var samples)) Rigs[sample.rig] = samples = new List<Sample>();
-                    samples.Add(sample); OriginTicks = Math.Min(OriginTicks,ticks);
                 }
-                if (rejected > 0) Warnings.Add(Path.GetFileName(file) + ": skipped " + rejected + " malformed pose rows.");
-                if (misaligned > 0) Warnings.Add(Path.GetFileName(file) + ": " + misaligned + " rows have a different column count; legacy decimal-comma numbers or unquoted delimiters cannot be reconstructed safely.");
-                if (nonExperiment > 0) Warnings.Add(Path.GetFileName(file) + ": excluded " + nonExperiment + " setup/replay pose rows from experiment playback.");
-                if (handoff > 0) Warnings.Add(Path.GetFileName(file) + ": excluded " + handoff + " verified idle/scene-handoff rows; acquisition gaps remain unchanged.");
+                catch (Exception error) when (ReplayPoseCache.OptionalFailure(error)) { }
+            }
+            if (result == null)
+            {
+                result = ReadPoseFile(file, cancellation, ReportFile);
+                if (cacheRoot != null && result != null && result.Rigs.Count != 0)
+                {
+                    try
+                    {
+                        source.Refresh();
+                        if (source.Exists && source.Length == fileBytes && source.LastWriteTimeUtc.Ticks == fileTicks)
+                        {
+                            using var saved = new ReplayPoseCache.PendingWrite(cacheRoot, source, PoseCacheContext());
+                            foreach (var rig in result.Rigs.Values)
+                                foreach (var sample in rig) saved.Add(sample, cancellation);
+                            saved.Complete(hash, result.Warnings);
+                        }
+                    }
+                    catch (Exception error) when (ReplayPoseCache.OptionalFailure(error)) { }
+                }
+            }
+            completedBytes += fileBytes;
+            reportProgress?.Invoke(completedBytes, totalBytes);
+            if (result == null) continue;
+            poseFiles.Add(file);
+            Warnings.AddRange(result.Warnings);
+            foreach (var pair in result.Rigs)
+            {
+                if (Rigs.TryGetValue(pair.Key, out var existing)) existing.AddRange(pair.Value);
+                else Rigs.Add(pair.Key, pair.Value);
             }
         }
-        if (Rigs.Count == 0) throw new InvalidDataException("This folder contains no readable animal pose CSV rows (Current Time, VR and six GameObject pose columns). " + string.Join(" ",Warnings.Take(4)));
-        double monotonicOrigin=Presentations.IsCurrentContract?Rigs.Values.SelectMany(rows=>rows).Min(sample=>sample.monotonicTime):0;
-        if(Presentations.IsCurrentContract)OriginTicks=Rigs.Values.SelectMany(rows=>rows).OrderBy(sample=>sample.unityFrame).First().timestampTicks;
+        if (Rigs.Count == 0) throw new InvalidDataException("This folder contains no readable animal pose CSV rows (Current Time, VR and six GameObject pose columns). " + string.Join(" ", Warnings.Take(4)));
+
+        double monotonicOrigin = double.PositiveInfinity;
+        int firstUnityFrame = int.MaxValue;
+        bool renderedClock = Presentations.IsCurrentContract;
         foreach (string id in Rigs.Keys.ToArray())
         {
-            // Stable sorting preserves explicit onset/swap rows written in the same timestamp tick.
-            var samples = (Presentations.IsCurrentContract?Rigs[id].OrderBy(sample=>sample.unityFrame):Rigs[id].OrderBy(sample => sample.timestampTicks)).ToList(); Rigs[id] = samples;
-            if(Presentations.IsCurrentContract)
-                for(int i=1;i<samples.Count;i++)if(samples[i].unityFrame<=samples[i-1].unityFrame||samples[i].monotonicTime<=samples[i-1].monotonicTime)
-                    throw new InvalidDataException("Acquisition frame clock is duplicated or not increasing for "+id);
-            string context = null; bool swapped = false; float? gray = null; string black = "";
-            foreach (var sample in samples)
+            cancellation.ThrowIfCancellationRequested();
+            var samples = Rigs[id];
+            // Stable sorting is only needed when merging files or recovering older out-of-order CSVs.
+            for (int i = 1; i < samples.Count; i++)
+                if (PoseOrder(samples[i], renderedClock) < PoseOrder(samples[i - 1], renderedClock))
+                {
+                    samples = samples.OrderBy(sample => PoseOrder(sample, renderedClock)).ToList();
+                    Rigs[id] = samples;
+                    break;
+                }
+            var first = samples[0];
+            if (!renderedClock)
             {
-                sample.time = Presentations.IsCurrentContract?sample.monotonicTime-monotonicOrigin:(sample.timestampTicks - OriginTicks) / (double)TimeSpan.TicksPerSecond;
-                if (sample.ContextKey != context) { context = sample.ContextKey; swapped = false; gray = null; black = ""; }
+                OriginTicks = Math.Min(OriginTicks, first.timestampTicks);
+                continue;
+            }
+            if (OriginTicks == long.MaxValue || first.unityFrame < firstUnityFrame)
+            {
+                firstUnityFrame = first.unityFrame;
+                OriginTicks = first.timestampTicks;
+            }
+            monotonicOrigin = Math.Min(monotonicOrigin, first.monotonicTime);
+        }
+
+        double firstExperimentTime = double.PositiveInfinity;
+        foreach (var pair in Rigs)
+        {
+            var samples = pair.Value;
+            Sample previous = null;
+            string context = null, black = "";
+            bool swapped = false;
+            float? gray = null;
+            for (int i = 0; i < samples.Count; i++)
+            {
+                if ((i & 4095) == 0) cancellation.ThrowIfCancellationRequested();
+                var sample = samples[i];
+                if (renderedClock && previous != null &&
+                    (sample.unityFrame <= previous.unityFrame || sample.monotonicTime <= previous.monotonicTime))
+                    throw new InvalidDataException("Acquisition frame clock is duplicated or not increasing for " + pair.Key);
+                sample.time = renderedClock ? sample.monotonicTime - monotonicOrigin :
+                    (sample.timestampTicks - OriginTicks) / (double)TimeSpan.TicksPerSecond;
+                if (previous == null || !sample.MatchesContext(previous))
+                {
+                    string nextContext = sample.ContextKey;
+                    if (nextContext != context) { context = nextContext; swapped = false; gray = null; black = ""; }
+                }
+                sample.savedContextKey = context;
                 if (sample.swapEvent) swapped = true;
                 if (sample.grayAtTrialStart.HasValue) gray = sample.grayAtTrialStart;
                 if (!string.IsNullOrEmpty(sample.blackSideAtTrialStart)) black = sample.blackSideAtTrialStart;
-                sample.colorsSwapped = swapped; sample.grayAtTrialStart = gray; sample.blackSideAtTrialStart = black;
+                sample.colorsSwapped = swapped;
+                sample.grayAtTrialStart = gray;
+                sample.blackSideAtTrialStart = black;
+                if (sample.time < firstExperimentTime && sample.scene != "ControlScene" && sample.scene != "ReplayScene")
+                    firstExperimentTime = sample.time;
+                previous = sample;
             }
-            Duration = Math.Max(Duration,samples[samples.Count-1].time);
+            Duration = Math.Max(Duration, samples[samples.Count - 1].time);
         }
-        FirstExperimentTime = Rigs.Values.SelectMany(samples => samples).Where(sample => sample.scene != "ControlScene" && sample.scene != "ReplayScene").Select(sample => sample.time).DefaultIfEmpty(0).Min();
-        if(!Presentations.IsCurrentContract)Warnings.Add("Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs.");
+        FirstExperimentTime = double.IsPositiveInfinity(firstExperimentTime) ? 0 : firstExperimentTime;
+        if (!renderedClock) Warnings.Add("Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs.");
+    }
+
+    private static long PoseOrder(Sample sample, bool renderedClock) => renderedClock ? sample.unityFrame : sample.timestampTicks;
+
+    private sealed class PoseFile
+    {
+        public readonly Dictionary<string, List<Sample>> Rigs;
+        public readonly List<string> Warnings;
+        public PoseFile() : this(new Dictionary<string, List<Sample>>(StringComparer.Ordinal), new List<string>()) { }
+        public PoseFile(Dictionary<string, List<Sample>> rigs, List<string> warnings) { Rigs = rigs; Warnings = warnings; }
+    }
+
+    private sealed class PoseColumns
+    {
+        public readonly int Time, Rig, Scene, LogicalScene, Config, StepName, Phase, Skybox, Presentation, Frame, Monotonic, Swap, Gray, Black, Step, StepIndex, Trial, Loop, Cumulative;
+        public readonly int[] Pose;
+        public readonly int[] Selected;
+        public bool CanCheckHandoff => Scene >= 0 && LogicalScene >= 0 && Phase >= 0 && Step >= 0 && Frame >= 0;
+
+        public PoseColumns(string[] header)
+        {
+            int Find(string name) => Array.IndexOf(header, name);
+            Time = Find("Current Time"); Rig = Find("VR"); Scene = Find("Scene"); LogicalScene = Find("CurrentSequenceScene");
+            Config = Find("ConfigFile"); StepName = Find("stepName"); Phase = Find("experimentPhase"); Skybox = Find("skyboxId");
+            Presentation = Find("presentationId"); Frame = Find("unityFrame"); Monotonic = Find("monotonicTime");
+            Swap = Find("swapElapsedSec"); Gray = Find("grayAtTrialStart"); Black = Find("blackSideAtTrialStart");
+            Step = Find("CurrentStep"); StepIndex = Find("stepIndex"); Trial = Find("CurrentTrial");
+            Loop = Find("loopIndex"); Cumulative = Find("cumulativeStep");
+            Pose = new[] { Find("GameObjectPosX"), Find("GameObjectPosY"), Find("GameObjectPosZ"), Find("GameObjectRotX"), Find("GameObjectRotY"), Find("GameObjectRotZ") };
+            Selected = new[] { Time, Rig, Scene, LogicalScene, Config, StepName, Phase, Skybox, Presentation, Frame, Monotonic,
+                Swap, Gray, Black, Step, StepIndex, Trial, Loop, Cumulative }.Concat(Pose).Where(index => index >= 0).Distinct().OrderBy(index => index).ToArray();
+        }
+    }
+
+    private readonly ref struct PoseRow
+    {
+        private readonly ReadOnlySpan<char> line;
+        private readonly (int start, int count)[] cells;
+        private readonly string[] quoted;
+
+        public PoseRow(string line, (int start, int count)[] cells, string[] quoted)
+        { this.line = line.AsSpan(); this.cells = cells; this.quoted = quoted; }
+
+        public ReadOnlySpan<char> this[int column] => column < 0 ? ReadOnlySpan<char>.Empty : quoted != null ? quoted[column].AsSpan() :
+            line.Slice(cells[column].start, cells[column].count);
+    }
+
+    private sealed class PoseText
+    {
+        private readonly string[] previous;
+        private string second;
+        private long secondTicks;
+
+        public PoseText(int columns) { previous = new string[columns]; }
+
+        public string Read(PoseRow row, int column)
+        {
+            if (column < 0) return "";
+            var value = row[column];
+            if (value.Length == 0) return "";
+            string last = previous[column];
+            if (last != null && value.SequenceEqual(last.AsSpan())) return last;
+            return previous[column] = value.ToString();
+        }
+
+        public bool ReadTimestamp(ReadOnlySpan<char> value, out long ticks)
+        {
+            // Acquisition writes seven fractional digits. Parse the shared whole second once.
+            if (value.Length == 27 && value[19] == '.')
+            {
+                int fraction = 0;
+                for (int i = 20; i < 27; i++)
+                {
+                    int digit = value[i] - '0';
+                    if ((uint)digit > 9) { fraction = -1; break; }
+                    fraction = fraction * 10 + digit;
+                }
+                if (fraction >= 0)
+                {
+                    var prefix = value.Slice(0, 19);
+                    if (prefix.SequenceEqual(second.AsSpan()))
+                    { ticks = secondTicks + fraction; return true; }
+                    if (DateTime.TryParseExact(prefix, "yyyy-MM-dd HH:mm:ss".AsSpan(), CultureInfo.InvariantCulture,
+                        DateTimeStyles.None, out DateTime whole))
+                    {
+                        second = prefix.ToString();
+                        secondTicks = whole.Ticks;
+                        ticks = secondTicks + fraction;
+                        return true;
+                    }
+                }
+            }
+            bool valid = DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime timestamp);
+            ticks = timestamp.Ticks;
+            return valid;
+        }
+    }
+
+    private static bool SlicePoseRow(string line, int columnCount, int[] selected, (int start, int count)[] cells)
+    {
+        int start = 0, next = 0;
+        for (int column = 0; column < columnCount; column++)
+        {
+            int end = line.IndexOf(',', start);
+            if (end < 0)
+            {
+                if (column != columnCount - 1) return false;
+                if (next < selected.Length) cells[column] = (start, line.Length - start);
+                return true;
+            }
+            if (next < selected.Length && column == selected[next])
+            {
+                cells[column] = (start, end - start);
+                next++;
+            }
+            start = end + 1;
+        }
+        return false;
+    }
+
+    private static bool PoseNumber(ReadOnlySpan<char> value, out float number)
+    {
+        number = 0;
+        return !value.IsEmpty && float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out number) &&
+            !float.IsNaN(number) && !float.IsInfinity(number);
+    }
+
+    private static int PoseInteger(ReadOnlySpan<char> value, int fallback = 0)
+    {
+        if (value.IsEmpty) return fallback;
+        if (value.Length == 1 && (uint)(value[0] - '0') <= 9) return value[0] - '0';
+        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed)) return parsed;
+        return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double numeric) &&
+            numeric >= int.MinValue && numeric <= int.MaxValue && numeric == Math.Truncate(numeric) ? (int)numeric : fallback;
+    }
+
+    private static bool KnownRig(string canonical) => canonical.Length == 3 && canonical[0] == 'V' && canonical[1] == 'R' && canonical[2] >= '1' && canonical[2] <= '9' ||
+        canonical.Length == 4 && canonical[0] == 'V' && canonical[1] == 'R' && canonical[2] == '1' && canonical[3] >= '0' && canonical[3] <= '6';
+
+    internal PoseProjection CreatePoseProjection(string file, string[] header) => new PoseProjection(this, file, header);
+
+    internal sealed class PoseProjection
+    {
+        private readonly ReplaySessionArchive archive;
+        private readonly string file;
+        private readonly PoseColumns map;
+        private readonly PoseText text;
+        private readonly bool renderedClock;
+        private int rejected, misaligned, nonExperiment, handoff;
+        private string lastRigName, canonicalRig, lastPresentation;
+        private bool allowedRig;
+
+        internal PoseProjection(ReplaySessionArchive archive, string file, string[] header)
+        {
+            this.archive = archive;
+            this.file = file;
+            map = new PoseColumns(header);
+            text = new PoseText(header.Length);
+            renderedClock = archive.Presentations.IsCurrentContract;
+        }
+
+        public bool IsAnimalFile => map.Time >= 0 && map.Rig >= 0;
+        public bool HasPoseColumns => IsAnimalFile && map.Pose.All(index => index >= 0);
+        internal int[] SelectedColumns => map.Selected;
+
+        internal void Reject(bool wrongColumnCount)
+        {
+            rejected++;
+            if (wrongColumnCount) misaligned++;
+        }
+
+        internal Sample ProjectText(string line, (int start, int count)[] spans) => Project(new PoseRow(line, spans, null));
+        public Sample ProjectCells(string[] cells) => Project(new PoseRow(null, null, cells));
+
+        private Sample Project(PoseRow row)
+        {
+            string scene = text.Read(row, map.Scene);
+            int frame = PoseInteger(row[map.Frame], -1), step = PoseInteger(row[map.Step], -1);
+            string phase = text.Read(row, map.Phase);
+            var exclusion = archive.PosePolicy.Classify(file, scene, text.Read(row, map.LogicalScene), phase, step, frame, map.CanCheckHandoff);
+            if (exclusion == RecordedPoseExclusion.SetupOrReplay) { nonExperiment++; return null; }
+            if (exclusion == RecordedPoseExclusion.VerifiedIdleOrHandoff) { handoff++; return null; }
+
+            string rigName = text.Read(row, map.Rig);
+            if (string.IsNullOrWhiteSpace(rigName) || !text.ReadTimestamp(row[map.Time], out long ticks) ||
+                !PoseNumber(row[map.Pose[0]], out float x) || !PoseNumber(row[map.Pose[1]], out float y) || !PoseNumber(row[map.Pose[2]], out float z) ||
+                !PoseNumber(row[map.Pose[3]], out float rx) || !PoseNumber(row[map.Pose[4]], out float ry) || !PoseNumber(row[map.Pose[5]], out float rz))
+            { rejected++; return null; }
+            if (rigName != lastRigName)
+            {
+                lastRigName = rigName;
+                canonicalRig = CanonicalRig(rigName);
+                allowedRig = !renderedClock || KnownRig(canonicalRig);
+            }
+            if (!allowedRig) return null;
+
+            string presentation = text.Read(row, map.Presentation);
+            double monotonic = double.TryParse(row[map.Monotonic], NumberStyles.Float, CultureInfo.InvariantCulture, out double clock) ? clock : double.NaN;
+            if (!renderedClock && !string.IsNullOrEmpty(presentation))
+                throw new InvalidDataException("Frame references a presentation but its same-build contract is missing.");
+            if (renderedClock)
+            {
+                if (frame < 0 || double.IsNaN(monotonic) || double.IsInfinity(monotonic))
+                    throw new InvalidDataException("Same-build pose frame has no monotonic rendered-frame clock.");
+                if (presentation != lastPresentation) { archive.Presentations.RequireEntry(presentation); lastPresentation = presentation; }
+            }
+            return new Sample
+            {
+                timestampTicks = ticks, rig = canonicalRig, recordedRigName = rigName,
+                position = new Vector3(x, y, z), rotation = new Vector3(rx, ry, rz), scene = scene,
+                configFile = text.Read(row, map.Config), stepName = text.Read(row, map.StepName), phase = phase,
+                skyboxId = text.Read(row, map.Skybox), presentationId = presentation, unityFrame = frame, monotonicTime = monotonic,
+                swapEvent = PoseNumber(row[map.Swap], out _), grayAtTrialStart = PoseNumber(row[map.Gray], out float gray) ? gray : (float?)null,
+                blackSideAtTrialStart = text.Read(row, map.Black), sequenceStep = step, stepIndex = PoseInteger(row[map.StepIndex], -1),
+                trial = PoseInteger(row[map.Trial]), loopIndex = PoseInteger(row[map.Loop]), cumulativeStep = PoseInteger(row[map.Cumulative])
+            };
+        }
+
+        public IReadOnlyList<string> FinishWarnings()
+        {
+            var warnings = new List<string>();
+            string name = Path.GetFileName(file);
+            if (!HasPoseColumns) warnings.Add("Missing pose columns: " + name);
+            if (rejected > 0) warnings.Add(name + ": skipped " + rejected + " malformed pose rows.");
+            if (misaligned > 0) warnings.Add(name + ": " + misaligned + " rows have a different column count; legacy decimal-comma numbers or unquoted delimiters cannot be reconstructed safely.");
+            if (nonExperiment > 0) warnings.Add(name + ": excluded " + nonExperiment + " setup/replay pose rows from experiment playback.");
+            if (handoff > 0) warnings.Add(name + ": excluded " + handoff + " verified idle/scene-handoff rows; acquisition gaps remain unchanged.");
+            return warnings;
+        }
+    }
+
+    private PoseFile ReadPoseFile(string file, CancellationToken cancellation, Action<long> reportProgress)
+    {
+        using var reader = OpenCsv(file, out var source);
+        string first = ReadCsvRecord(reader);
+        if (first == null) return null;
+        string[] header = Csv(first.TrimStart('\ufeff'));
+        var projector = CreatePoseProjection(file, header);
+        if (!projector.IsAnimalFile) return null;
+        var result = new PoseFile();
+        if (projector.HasPoseColumns)
+        {
+            var cells = new (int, int)[header.Length];
+            string line, lastRig = null;
+            List<Sample> samples = null;
+            int count = 0;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if ((count++ & 4095) == 0)
+                {
+                    cancellation.ThrowIfCancellationRequested();
+                    reportProgress?.Invoke(source.Position);
+                }
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                Sample sample;
+                if (line.IndexOf('"') >= 0)
+                {
+                    string[] quoted;
+                    try { quoted = Csv(ReadCsvRecord(reader, line)); }
+                    catch (InvalidDataException) { projector.Reject(false); continue; }
+                    if (quoted.Length != header.Length) { projector.Reject(true); continue; }
+                    sample = projector.ProjectCells(quoted);
+                }
+                else
+                {
+                    if (!SlicePoseRow(line, header.Length, projector.SelectedColumns, cells)) { projector.Reject(true); continue; }
+                    sample = projector.ProjectText(line, cells);
+                }
+                if (sample == null) continue;
+                if (sample.rig != lastRig)
+                {
+                    lastRig = sample.rig;
+                    if (!result.Rigs.TryGetValue(lastRig, out samples)) result.Rigs[lastRig] = samples = new List<Sample>();
+                }
+                samples.Add(sample);
+            }
+        }
+        result.Warnings.AddRange(projector.FinishWarnings());
+        return result;
     }
 
     public JObject ExperimentFor(Sample sample)
@@ -391,9 +870,11 @@ public sealed class ReplaySessionArchive
     public static string[] RecordedFiles(string directory) => CsvFiles(directory)
         .Concat(Directory.GetFiles(directory, "*").Where(path => path.EndsWith(".matpop", StringComparison.OrdinalIgnoreCase)))
         .OrderBy(path => path, StringComparer.Ordinal).ToArray();
-    public static StreamReader OpenCsv(string path)
+    public static StreamReader OpenCsv(string path) => OpenCsv(path, out _);
+    private static StreamReader OpenCsv(string path, out FileStream source)
     {
-        Stream stream = new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite);
+        source = new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite);
+        Stream stream = source;
         if (path.EndsWith(".gz",StringComparison.OrdinalIgnoreCase)) stream = new GZipStream(stream,CompressionMode.Decompress);
         return new StreamReader(stream,Encoding.UTF8,true,65536);
     }
@@ -410,9 +891,10 @@ public sealed class ReplaySessionArchive
         return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double numeric) &&
             numeric >= int.MinValue && numeric <= int.MaxValue && numeric == Math.Truncate(numeric) ? (int)numeric : fallback;
     }
-    public static string ReadCsvRecord(StreamReader reader)
+    public static string ReadCsvRecord(StreamReader reader) => ReadCsvRecord(reader, reader.ReadLine());
+
+    private static string ReadCsvRecord(StreamReader reader, string first)
     {
-        string first = reader.ReadLine();
         if (first == null || first.IndexOf('"') < 0) return first;
         string line = first;
         StringBuilder record = null;

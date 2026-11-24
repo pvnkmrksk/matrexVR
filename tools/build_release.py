@@ -23,6 +23,8 @@ TARGETS = {
     'Linux': ('StandaloneLinux64', 'Linux64', 'MATREX VR.x86_64'),
 }
 MCP_SOURCE_FILES = ('tools/matrex_control_mcp.py', 'tools/matrex_control_mcp.py.lock')
+RUN_DATA_GUIDE = 'Assets/StreamingAssets/RunData_README.md'
+LINUX_LAUNCHER = 'tools/Open MATREX VR.sh'
 
 def git(*args):
     return subprocess.check_output(['git', *args], cwd=ROOT)
@@ -124,6 +126,19 @@ def stage_mcp_adapter(stage, platform, revision):
     return dict(sourceRevision=revision, transport='stdio', enabledByDefault=False, files=files)
 
 
+def stage_desktop_entrypoints(stage, platform, revision, project):
+    """Ship the pinned data guide and, on Linux, the portable launcher."""
+    guide = project / RUN_DATA_GUIDE
+    payloads = [('RUN-DATA.md', guide.read_bytes(), 0o644)] if guide.is_file() else []
+    if platform == 'Linux' and git('ls-tree', '-r', '--name-only', revision, '--', LINUX_LAUNCHER).strip():
+        payloads.append(('Open MATREX VR.sh', git('show', revision + ':' + LINUX_LAUNCHER), 0o755))
+    for name, payload, mode in payloads:
+        destination = stage / name
+        destination.write_bytes(payload)
+        destination.chmod(mode)
+    return [dict(path=name, sha256=hashlib.sha256(payload).hexdigest()) for name, payload, _ in payloads]
+
+
 def package(build, output, version, platform, revision, project, quickstart, with_companions=False, with_dashboard=True,
             local_native_camera_fix=False, local_dashboard_archive=None,
             verified_native_binary=None, native_binary_provenance=None):
@@ -143,6 +158,7 @@ def package(build, output, version, platform, revision, project, quickstart, wit
             shutil.rmtree(p)
     if platform == 'Linux':
         (stage / 'MATREX VR.x86_64').chmod(0o755)
+    desktop_files = stage_desktop_entrypoints(stage, platform, revision, project)
     mcp_adapter = stage_mcp_adapter(stage, platform, revision)
     companion_root = stage / 'MATREX VR.app' / 'Contents' / 'Companions' if platform == 'macOS' else stage / 'Companions'
     companion_catalog = {}
@@ -189,7 +205,7 @@ def package(build, output, version, platform, revision, project, quickstart, wit
         raise RuntimeError('Refusing to package an unsuccessful Unity build')
     manifest = dict(version=version, sourceRevision=revision, unityVersion='6000.3.16f1', platform=label,
                     publicSystemTemplate=True, companionsBundled=with_companions, dashboardBundled=with_dashboard,
-                    mcpBundled=mcp_adapter is not None, mcpAdapter=mcp_adapter,
+                    mcpBundled=mcp_adapter is not None, mcpAdapter=mcp_adapter, desktopFiles=desktop_files,
                     companionCatalogId=companion_catalog.get('catalogId'), companionPackages=companion_catalog.get('entries', []),
                     localNativeCameraCorrection=companion_catalog.get('localNativeCorrection'), dashboardPackages=dashboard_entries,
                     builderSha256=hashlib.sha256((ROOT / 'Assets/Editor/MatrexReleaseBuilder.cs').read_bytes()).hexdigest(),
