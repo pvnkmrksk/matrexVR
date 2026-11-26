@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-/// <summary>Opens the ten-condition path pilot with desktop keyboard controls.</summary>
+/// <summary>Opens the twelve-condition path pilot with desktop keyboard controls.</summary>
 [InitializeOnLoad]
 public static class PathPilotLauncher
 {

@@ -46309,6 +46309,20 @@
     ],
     "additionalProperties": true,
     "properties": {
+      "sessionSeconds": {
+        "type": "number",
+        "default": 0.0,
+        "x-ui": {
+          "unit": "seconds"
+        }
+      },
+      "groundAppearance": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": null
+      },
       "seed": {
         "type": "integer",
         "minimum": -2147483648,
@@ -46339,6 +46353,33 @@
           "resetRotationOnStart": {
             "type": "boolean",
             "default": true
+          },
+          "pathGround": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "openingAngle": {
+                "type": "number",
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": 85.0
+              },
+              "pathVisible": {
+                "type": "boolean",
+                "default": true
+              },
+              "preparedTexturePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "default": null
           },
           "name": {
             "type": [
@@ -46951,6 +46992,33 @@
             "resetRotationOnStart": {
               "type": "boolean",
               "default": true
+            },
+            "pathGround": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "openingAngle": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 85.0
+                },
+                "pathVisible": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "preparedTexturePath": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              },
+              "default": null
             },
             "name": {
               "type": [

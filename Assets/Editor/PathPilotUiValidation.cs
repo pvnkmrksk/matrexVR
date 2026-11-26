@@ -55,7 +55,7 @@ public static class PathPilotUiValidation
                     Check(ui.Workspace.System.Path==systemPath&&ui.Workspace.System.Root.ToString(Formatting.None)==systemJson,"Load preserves the apparatus path and exact settings");
                     Check(ui.Workspace.Validate().Count==0,"Pilot passes normal workspace validation");
                     Check(root.Q<Label>("sequence-total-duration").text=="3 h total","Sequence overview displays true session duration");
-                    Check(root.Query<Label>().ToList().Any(l=>l.text.Contains("10 conditions · randomized complete blocks")),"Ten-condition randomized protocol is visible");
+                    Check(root.Query<Label>().ToList().Any(l=>l.text.Contains("12 conditions · randomized complete blocks")),"Twelve-condition randomized protocol is visible");
                     Submit(root.Q<Button>("back-to-session"));Next(3);break;
                 case 3:
                     Check(ui.Workspace.Sequence.Path.Replace('\\','/').EndsWith("PathAnglePilot/sequence.json"),"Returning to Start retains the pilot selection");

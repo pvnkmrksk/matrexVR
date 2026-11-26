@@ -15,6 +15,7 @@ public sealed class PathPilotPreview : EditorWindow
     private PathGroundAppearance appearance;
     private int selected = 3;
     private bool noBars;
+    private bool noPath;
     private Scene scene;
     private GameObject root;
     private Camera camera;
@@ -48,7 +49,11 @@ public sealed class PathPilotPreview : EditorWindow
         EditorGUI.BeginChangeCheck();
         selected = GUILayout.SelectionGrid(selected, Array.ConvertAll(Angles,a=>a+"°"), 9);
         noBars = EditorGUILayout.Toggle("85° no-bars condition", noBars);
+        noPath = EditorGUILayout.Toggle("Hide path (grass only)", noPath);
         appearance.pathWidthCm = EditorGUILayout.Slider("Path width (cm)", appearance.pathWidthCm, .5f, 12);
+        appearance.pathEdgeSoftnessCm = EditorGUILayout.Slider("Edge fade width (cm)", appearance.pathEdgeSoftnessCm, 0, appearance.pathWidthCm);
+        appearance.pathEdgeRoughnessCm = EditorGUILayout.Slider("Edge irregularity (cm)", appearance.pathEdgeRoughnessCm, 0, appearance.pathWidthCm / 4);
+        appearance.pathMottling = EditorGUILayout.Slider("Path mottling", appearance.pathMottling, 0, 1);
         appearance.pathDarkness = EditorGUILayout.Slider("Path darkness", appearance.pathDarkness, 0, 1);
         appearance.groundBrightness = EditorGUILayout.Slider("Ground brightness", appearance.groundBrightness, .05f, 1);
         appearance.textureScaleCm = EditorGUILayout.Slider("Grass scale (cm)", appearance.textureScaleCm, 1, 30);
@@ -74,7 +79,7 @@ public sealed class PathPilotPreview : EditorWindow
         }
         if (!string.IsNullOrEmpty(error)) EditorGUILayout.HelpBox(error,MessageType.Error);
         float angle = noBars ? 85 : Angles[selected];
-        EditorGUILayout.LabelField($"{angle:0}° opening · fork z = {PathGround.ForkZ(angle):F2} cm · goals ±20° at 60 cm");
+        EditorGUILayout.LabelField(noPath ? (noBars ? "No path · no bars" : "No path · two bars · goals ±20° at 60 cm") : $"{angle:0}° opening · fork z = {PathGround.ForkZ(angle):F2} cm · goals ±20° at 60 cm");
         EditorGUILayout.LabelField("Overhead (+z up)                                     Ant view (start pose)",EditorStyles.boldLabel);
         Rect row = GUILayoutUtility.GetRect(640,320,GUILayout.ExpandWidth(true));
         float width = Mathf.Min(row.width/2-4,360);
@@ -91,7 +96,7 @@ public sealed class PathPilotPreview : EditorWindow
             scene=EditorSceneManager.NewPreviewScene();
             root=new GameObject("Pilot preview"); SceneManager.MoveGameObjectToScene(root,scene);
             float angle=noBars?85:Angles[selected];
-            PathGround.Create(root.transform,0,new PathGroundConfig{openingAngle=angle},appearance,false);
+            PathGround.Create(root.transform,0,new PathGroundConfig{openingAngle=angle,pathVisible=!noPath},appearance,false);
             barMaterial = new Material(Shader.Find("Unlit/Color"));barMaterial.color=Color.black;
             if (!noBars) foreach (int side in new[] {-1,1})
             {
@@ -120,10 +125,10 @@ public sealed class PathPilotPreview : EditorWindow
         Directory.CreateDirectory(output);
         var preview=CreateInstance<PathPilotPreview>();
         try {
-            foreach(int index in new[] {0,1,2,3,4,5,6,7,8,9}) {
-                preview.selected=index==9?3:index;preview.noBars=index==9;preview.Rebuild();
+            foreach(int index in new[] {0,1,2,3,4,5,6,7,8,9,10,11}) {
+                preview.selected=index>=9?3:index;preview.noBars=index==9||index==11;preview.noPath=index>=10;preview.Rebuild();
                 if(preview.error!=null)throw new Exception(preview.error);
-                string name=index==9?"085-no-bars":Angles[index].ToString("000");
+                string name=index==11?"no-bars-no-path":index==10?"two-bars-no-path":index==9?"085-no-bars":Angles[index].ToString("000");
                 Save(preview.overhead,Path.Combine(output,name+"-overhead.png"));
                 Save(preview.antView,Path.Combine(output,name+"-ant.png"));
             }

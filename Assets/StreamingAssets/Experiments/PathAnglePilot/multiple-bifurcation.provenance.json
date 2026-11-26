@@ -1,0 +1,57 @@
+{
+  "variant": "multiple-bifurcation-v1",
+  "sourceBuild": "DiacammaMultipleBifurcation/MultipleBifurcation_Data",
+  "sourceFilesSha256": {
+    "sharedassets5.assets": "7f6f3f85a6fe2e2e59c2d7f863956ab7e9db5323021bb00eefd2d10f84c64d49",
+    "sharedassets5.assets.resS": "bc02fe5968844804040be0262643320a872f8f58827aae73fb4288d17fba50fa"
+  },
+  "unityPyVersion": "1.25.2",
+  "pillowVersion": "12.3.0",
+  "texture": {
+    "name": "DataBifurcation",
+    "assetFile": "sharedassets5.assets",
+    "pathId": 4,
+    "sizePixels": [
+      4096,
+      4096
+    ],
+    "cropPixels": [
+      0,
+      3072,
+      1024,
+      4096
+    ]
+  },
+  "tileSha256": "69fc2c7662cb0db550fd43be61de68e13da6817ca070bc0de0ed323e01f53f76",
+  "appearance": {
+    "pathWidthCm": 5.0,
+    "pathDarkness": 0.65,
+    "groundBrightness": 1,
+    "textureScaleCm": 250,
+    "extentCm": 400,
+    "groundHeightCm": -1,
+    "texturePath": "Experiments/PathAnglePilot/multiple-bifurcation-grass.png",
+    "preparedGroundImage": false,
+    "pathEdgeSoftnessCm": 3.0,
+    "pathEdgeRoughnessCm": 0.3,
+    "pathMottling": 0.02
+  },
+  "evidence": {
+    "terrainLayer": "sharedassets5.assets:30",
+    "terrainScene": "level5",
+    "terrainTileSizeCm": 1000,
+    "cropTileSizeCm": 250,
+    "material": "Default-Terrain-Standard",
+    "shader": "Nature/Terrain/Standard",
+    "terrainHeightCm": -1,
+    "referenceStemWidthPixelsAbout": 18,
+    "referenceHalfDarknessWidthCmAbout": 5,
+    "reference10To90EdgeTransitionCmAbout": 1.8,
+    "referencePathToGrassRgbRatioAbout": [
+      0.34,
+      0.35,
+      0.36
+    ]
+  },
+  "adaptation": "Keep pilot angles, goal positions, triggers, and apparatus settings. Rounded procedural path approximately matches measured width/darkness; use a 3 cm fade, 0.3 cm fixed edge irregularity and 2% darkness mottling. Refined half-darkness width is about 5 cm; 10\u201390% transition about 1.8 cm. Grass is an exact decoded RGB crop. Pilot uses unlit rendering, not the old scene ambient lighting."
+}

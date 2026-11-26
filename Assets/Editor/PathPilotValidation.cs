@@ -72,7 +72,7 @@ public static class PathPilotValidation
             design["intertrial"]["trigger"]["seconds"]=.05;
             foreach(JObject step in design["steps"])step["trigger"]=new JObject{["type"]="time",["seconds"]=.1};
         } else {
-            design["steps"]=new JArray(source["steps"][test==2?3:9].DeepClone());
+            design["steps"]=new JArray(source["steps"][test==2?10:test==1?11:9].DeepClone());
             if(test>=3) {
                 design["sessionSeconds"]=3;
                 if(test!=4) design["intertrial"]["trigger"]["seconds"]=.1;
@@ -109,13 +109,14 @@ public static class PathPilotValidation
                 var blocks=events.Where(e=>(string)e["kind"]=="block_end"&&(bool?)e["data"]["incomplete"]==false).ToArray();
                 if(blocks.Length<2)return;
                 var orders=events.Where(e=>(string)e["kind"]=="block_start").Take(2).Select(e=>(JArray)e["data"]["order"]).ToArray();
-                foreach(var order in orders)Check(order.Count==10&&order.Select(v=>v.ToString()).Distinct().Count()==10,"Complete randomized block contains each of ten conditions exactly once");
+                foreach(var order in orders)Check(order.Count==12&&order.Select(v=>v.ToString()).Distinct().Count()==12,"Complete randomized block contains each of twelve conditions exactly once");
                 Check(orders[0].ToString()!=orders[1].ToString(),"Successive blocks are reshuffled with a continuing recorded RNG seed");
                 CompleteCase();return;
             }
             if(test==1) {
                 if(starts.Length>0&&!moved) {
-                    var ground=Object.FindFirstObjectByType<PathGround>();Check(ground!=null,"No-bars trial retains painted ground");
+                    var ground=Object.FindFirstObjectByType<PathGround>();Check(ground!=null,"Blank-ground trial retains grass ground");
+                    Check(ground.GetComponent<Renderer>().sharedMaterial.GetFloat("_PathVisible")==0,"Blank-ground trial has no painted path");
                     Check(ground.GetComponentsInChildren<Collider>().Length==0,"Ground has no colliders");
                     Check(Object.FindObjectsByType<TriggerRelay>(FindObjectsSortMode.None).Length==0,"No-bars condition has no goal triggers");
                     MoveGoal(-1);moved=true;
@@ -130,6 +131,8 @@ public static class PathPilotValidation
             if(test==2) {
                 if(starts.Length>contacts&&contacts<2&&main.SessionElapsedSeconds-(double)starts.Last()["elapsedSeconds"]>.3) {
                     var ground=Object.FindFirstObjectByType<PathGround>();Check(ground!=null,"Bar trial includes ground");
+                    Check(ground.GetComponent<Renderer>().sharedMaterial.GetFloat("_PathVisible")==0,"Two-bars no-path trial hides only the path");
+                    Check((bool)starts.Last()["data"]["pathVisible"]==false&&starts.Last()["data"]["angle"].Type==JTokenType.Null,"No-path trial events explicitly omit path angle");
                     var rig=GameObject.Find("VR1");var camera=rig.GetComponentsInChildren<Camera>().First(c=>c.enabled);
                     Check((camera.cullingMask&(1<<ground.gameObject.layer))!=0,"Animal camera sees its ground layer");
                     if(contacts==0)Capture("runtime-bars.png");

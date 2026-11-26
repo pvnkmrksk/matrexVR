@@ -68,8 +68,9 @@ public partial class DynamicSequenceController
         progress.started = PilotNow;
         PilotEvent(step == designFile.intertrial ? "intertrial_start" : "trial_start", new {
             rig = state.id, block = state.loopCount + 1, trialInBlock = progress.completed + 1,
-            step = step.name, angle = step.pathGround?.openingAngle,
-            forkZCm = step.pathGround == null ? (float?)null : PathGround.ForkZ(step.pathGround.openingAngle),
+            step = step.name, pathVisible = step.pathGround?.pathVisible ?? false,
+            angle = step.pathGround != null && step.pathGround.pathVisible ? (float?)step.pathGround.openingAngle : null,
+            forkZCm = step.pathGround == null || !step.pathGround.pathVisible ? (float?)null : PathGround.ForkZ(step.pathGround.openingAngle),
             cumulativeStep = state.cumulativeStep });
     }
     private void PilotStepEnded(RigState state, Step step, AreaWaitResult result)

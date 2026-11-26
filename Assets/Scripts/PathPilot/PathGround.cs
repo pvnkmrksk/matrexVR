@@ -5,6 +5,7 @@ using UnityEngine;
 public sealed class PathGroundConfig
 {
     public float openingAngle = 85;
+    public bool pathVisible = true;
     // Optional condition-specific, already painted image, mapped to the entire ground square.
     public string preparedTexturePath;
     public void Validate()
@@ -19,6 +20,11 @@ public sealed class PathGroundAppearance
 {
     public float pathWidthCm = 4;
     public float pathDarkness = .65f;
+    // Full width of the smooth edge fade, centred on the nominal path boundary.
+    // Zero retains the historical antialiased edge for old configurations/replays.
+    public float pathEdgeSoftnessCm;
+    public float pathEdgeRoughnessCm;
+    public float pathMottling;
     public float groundBrightness = .55f;
     public float textureScaleCm = 8;
     public float extentCm = 400;
@@ -27,9 +33,11 @@ public sealed class PathGroundAppearance
     public bool preparedGroundImage;
     public void Validate()
     {
-        foreach (float value in new[] {pathWidthCm, pathDarkness, groundBrightness, textureScaleCm, extentCm, groundHeightCm})
+        foreach (float value in new[] {pathWidthCm, pathDarkness, pathEdgeSoftnessCm, pathEdgeRoughnessCm, pathMottling, groundBrightness, textureScaleCm, extentCm, groundHeightCm})
             if (float.IsNaN(value) || float.IsInfinity(value)) throw new ArgumentException("Ground values must be finite.");
         if (pathWidthCm <= 0 || pathDarkness < 0 || pathDarkness > 1 || groundBrightness < 0 || groundBrightness > 1 ||
+            pathEdgeSoftnessCm < 0 || pathEdgeSoftnessCm > pathWidthCm ||
+            pathEdgeRoughnessCm < 0 || pathEdgeRoughnessCm > pathWidthCm / 4 || pathMottling < 0 || pathMottling > 1 ||
             textureScaleCm <= 0 || extentCm < 150 || groundHeightCm >= 0)
             throw new ArgumentException("Invalid path width, darkness, brightness, texture scale, extent or ground height.");
         if (preparedGroundImage && string.IsNullOrWhiteSpace(texturePath))
@@ -49,6 +57,8 @@ public sealed class PathGround : MonoBehaviour
     public static PathGround Create(Transform parent, int layer, PathGroundConfig config, PathGroundAppearance appearance, bool archive = true)
     {
         config.Validate(); appearance.Validate();
+        if (!config.pathVisible && (appearance.preparedGroundImage || !string.IsNullOrWhiteSpace(config.preparedTexturePath)))
+            throw new ArgumentException("A no-path condition requires grass-only imagery, not a prepared path image.");
         var host = new GameObject("PathGround_" + config.openingAngle + "deg");
         host.transform.SetParent(parent, false);
         host.layer = layer;
@@ -72,6 +82,10 @@ public sealed class PathGround : MonoBehaviour
         material.SetVector("_Goal", new Vector4(RightGoal.x, RightGoal.y,0,0));
         material.SetFloat("_PathWidth", appearance.pathWidthCm);
         material.SetFloat("_PathDarkness", appearance.pathDarkness);
+        material.SetFloat("_PathVisible", config.pathVisible ? 1 : 0);
+        material.SetFloat("_PathEdgeSoftness", appearance.pathEdgeSoftnessCm);
+        material.SetFloat("_PathEdgeRoughness", appearance.pathEdgeRoughnessCm);
+        material.SetFloat("_PathMottling", appearance.pathMottling);
         material.SetFloat("_Brightness", appearance.groundBrightness);
         material.SetFloat("_TileCm", appearance.textureScaleCm);
         string reference = string.IsNullOrEmpty(config.preparedTexturePath) ? appearance.texturePath : config.preparedTexturePath;

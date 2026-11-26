@@ -110,6 +110,11 @@ Assets/Materials/PaintedLeftv2.png.meta
 Assets/Materials/PaintedRightv2.png
 Assets/Materials/PaintedRightv2.png.meta
 *.png
+!Assets/StreamingAssets/Experiments/PathAnglePilot/diacamma-grass.png
+!Assets/StreamingAssets/Experiments/PathAnglePilot/diacamma-grass.provenance.json.meta
+!Assets/StreamingAssets/Experiments/PathAnglePilot/multiple-bifurcation-grass.png
+!Assets/StreamingAssets/Experiments/PathAnglePilot/multiple-bifurcation.provenance.json.meta
+!Assets/StreamingAssets/Experiments/PathAnglePilot/appearance.multiple-bifurcation.json.meta
 !Assets/StreamingAssets/Photosphere/adaminaby.png
 
 # Local download/authoring state; generated terrain under Assets/RWT_Result is versioned.

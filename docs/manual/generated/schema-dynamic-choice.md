@@ -1,10 +1,31 @@
 # Dynamic-Choice schema fields
 
-This atlas lists **176 emitted property paths** from the current `dynamic-choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **186 emitted property paths** from the current `dynamic-choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
 Every field has a deep link and is indexed by the manual search. Array items use `[]` in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.
+
+## sessionSeconds group
+
+### `sessionSeconds`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+
+## groundAppearance group
+
+### `groundAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
 
 ## seed group
 
@@ -78,6 +99,41 @@ Apply the initial orientation when this experiment begins. When disabled, retain
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `true` |
+
+### `intertrial.pathGround`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `intertrial.pathGround.openingAngle`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `85.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `intertrial.pathGround.pathVisible`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `intertrial.pathGround.preparedTexturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
 
 ### `intertrial.name`
 
@@ -793,6 +849,41 @@ Apply the initial orientation when this experiment begins. When disabled, retain
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `true` |
+
+### `steps[].pathGround`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `steps[].pathGround.openingAngle`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `85.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `steps[].pathGround.pathVisible`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `steps[].pathGround.preparedTexturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
 
 ### `steps[].name`
 

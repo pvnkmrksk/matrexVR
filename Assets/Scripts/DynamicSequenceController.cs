@@ -391,7 +391,14 @@ public partial class DynamicSequenceController : MonoBehaviour, IInSceneSequence
         }
         else if (step.trigger.type == "time")
         {
-            yield return new WaitForSeconds(step.trigger.seconds);
+            if (pilotActive)
+            {
+                // Unity's frame clock predates ground/texture setup in this frame.
+                // Start pilot durations after setup on the same monotonic clock as events.
+                double end = PilotNow + step.trigger.seconds;
+                while (PilotNow < end) yield return null;
+            }
+            else yield return new WaitForSeconds(step.trigger.seconds);
         }
         else
         {
@@ -704,10 +711,13 @@ public partial class DynamicSequenceController : MonoBehaviour, IInSceneSequence
         float deadline = step.trigger.timeoutSeconds > 0
             ? Time.time + step.trigger.timeoutSeconds
             : float.PositiveInfinity;
+        bool pilotTiming = pilotActive;
+        double pilotDeadline = pilotTiming && step.trigger.timeoutSeconds > 0
+            ? PilotNow + step.trigger.timeoutSeconds : double.PositiveInfinity;
 
         while (!done)
         {
-            if (Time.time >= deadline)
+            if (pilotTiming ? PilotNow >= pilotDeadline : Time.time >= deadline)
             {
                 result.TimedOut = true;
                 break;

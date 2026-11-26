@@ -38,5 +38,12 @@
   "overheadCamera": {
     "enabled": false
   },
-  "previewPurpose": "Path-angle pilot keyboard preview; not animal data."
+  "previewPurpose": "Path-angle pilot keyboard preview; not animal data.",
+  "apparatusConfiguration": {
+    "version": 1,
+    "configured": true,
+    "presentation": "desktop",
+    "monitorCount": 1,
+    "launchBundledTrackers": false
+  }
 }

@@ -46367,6 +46367,10 @@
                 "maximum": 3.40282347E+38,
                 "default": 85.0
               },
+              "pathVisible": {
+                "type": "boolean",
+                "default": true
+              },
               "preparedTexturePath": {
                 "type": [
                   "string",
@@ -47001,6 +47005,10 @@
                   "minimum": -3.40282347E+38,
                   "maximum": 3.40282347E+38,
                   "default": 85.0
+                },
+                "pathVisible": {
+                  "type": "boolean",
+                  "default": true
                 },
                 "preparedTexturePath": {
                   "type": [

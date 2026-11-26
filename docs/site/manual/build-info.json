@@ -2,8 +2,8 @@
   "generator": "tools/build_docs_site.py",
   "format": "Pre-rendered static HTML with browser-local section search",
   "pages": 53,
-  "searchSections": 4757,
-  "schemaPropertyPaths": 4181,
+  "searchSections": 4769,
+  "schemaPropertyPaths": 4191,
   "schemaFamilies": {
     "system": 74,
     "sequence": 51,
@@ -12,7 +12,7 @@
     "kannadi": 983,
     "optomotor": 573,
     "rugosity": 14,
-    "dynamic-choice": 176
+    "dynamic-choice": 186
   },
   "sourceSha256": {
     "docs/manual/index.md": "ba2f26b55ecaa720b78672970f9106176734e7341c2e4ef883be58b07d39dc78",
@@ -32,7 +32,7 @@
     "docs/animal-agent-compatibility.md": "3db2a43270b48cc307a454104d2dfb56cff1a99c26c7bad498c445d38724c82d",
     "docs/experiment-phases.md": "02706ed3d4d02f88a5e3f3441abd97f294eb0b3974a5dbe4a94428cdf208b18b",
     "docs/kinefly-auto-trim.md": "1ee0d9f95a2e0d08c62bae9a5d8eb652d34bfff3a449369270167f3bed2bea33",
-    "docs/manual/generated/schema-index.md": "38cf357217fba51a7460f87d1221e56a5e8626bfbce40dc41c8a8bfcafb64891",
+    "docs/manual/generated/schema-index.md": "a850ace3f19980f38f5af1085759045c744bc4ee4f0ad3744fc204b9515e27ca",
     "docs/manual/generated/schema-system.md": "83e904662d7f2bba97a17a812f5ac7d943a1a79c5a83b6308f73a9f0f92979cc",
     "docs/manual/generated/schema-sequence.md": "faaba40178761c41edff5c9c4f7848e6753536019c29d3afd1187a2e0da1948b",
     "docs/manual/generated/schema-choice.md": "bdfb732085e13d09cadddc249951fd25824158b37abb62a17e74ef78d47c2dae",
@@ -40,7 +40,7 @@
     "docs/manual/generated/schema-kannadi.md": "cbb9cd6e1e7a6c0635df774460d304f57938b508995eafa7c630394802c97c94",
     "docs/manual/generated/schema-optomotor.md": "5c279a56e45edcd78e88b43ec4906652d9e2b625fdaca14a1647855f52f3e390",
     "docs/manual/generated/schema-rugosity.md": "32562c9ea26fc12668567db5e19369081365e744d7d87d962e9d22d832abd8fa",
-    "docs/manual/generated/schema-dynamic-choice.md": "007e428b7f1771940522a38781371b214c693001a3dd9f72281002c15c20cc57",
+    "docs/manual/generated/schema-dynamic-choice.md": "246c0d2246d3e1a0881452201c583f402701bceb66e0a41f1f7887d66a0ff60d",
     "docs/night-sky.md": "aa4237c3b7e1563cd524db88884a866efb11821ca8f75b714f8068b1c2a3d19e",
     "docs/generated-bogong-swarm.md": "9d240528941dd8c0d0af67bf05ed4217d24f196274411918433d7335033ab883",
     "docs/swarm-playback.md": "4d8e89a612ecc7cd4f67b935b52a32afbed9b268cf9bfcf3279b56812da96a6a",
